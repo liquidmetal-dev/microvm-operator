@@ -20,22 +20,105 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+const (
+	// MvmFinalizer allows ReconcileMicrovm to clean up resources associated with Microvm
+	// before removing it from the apiserver.
+	MvmFinalizer = "microvm.infrastructure.microvm.x-k8s.io"
+)
 
 // MicrovmSpec defines the desired state of Microvm
 type MicrovmSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
-	// Foo is an example field of Microvm. Edit microvm_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// Host sets the host device address for Microvm creation.
+	// +kubebuilder:validation:Required
+	Host Host `json:"host"`
+	// VMSpec contains the Microvm spec.
+	// +kubebuilder:validation:Required
+	VMSpec `json:",inline"`
+	// SSHPublicKeys is list of SSH public keys which will be added to the Microvm.
+	// +optional
+	SSHPublicKeys []SSHPublicKey `json:"sshPublicKeys,omitempty"`
+	// mTLS Configuration:
+	//
+	// It is recommended that each flintlock host is configured with its own cert
+	// signed by a common CA, and set to use mTLS.
+	// The flintlock-operator should be provided with the CA, and a client cert and key
+	// signed by that CA.
+	// TLSSecretRef is a reference to the name of a secret which contains TLS cert information
+	// for connecting to Flintlock hosts.
+	// The secret should be created in the same namespace as the MicroVMCluster.
+	// The secret should be of type Opaque
+	// with the addition of a ca.crt key.
+	//
+	// apiVersion: v1
+	// kind: Secret
+	// metadata:
+	// 	name: secret-tls
+	// 	namespace: default  <- same as Cluster
+	// type: Opaque
+	// data:
+	// 	tls.crt: |
+	// 		-----BEGIN CERTIFICATE-----
+	// 		MIIC2DCCAcCgAwIBAgIBATANBgkqh ...
+	// 		-----END CERTIFICATE-----
+	// 	tls.key: |
+	// 		-----BEGIN EC PRIVATE KEY-----
+	// 		MIIEpgIBAAKCAQEA7yn3bRHQ5FHMQ ...
+	// 		-----END EC PRIVATE KEY-----
+	// 	ca.crt: |
+	// 		-----BEGIN CERTIFICATE-----
+	// 		MIIEpgIBAAKCAQEA7yn3bRHQ5FHMQ ...
+	// 		-----END CERTIFICATE-----
+	// +optional
+	TLSSecretRef string `json:"tlsSecretRef,omitempty"`
 }
 
 // MicrovmStatus defines the observed state of Microvm
 type MicrovmStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// Ready is true when the provider resource is ready.
+	// +optional
+	// +kubebuilder:default=false
+	Ready bool `json:"ready"`
+
+	// VMState indicates the state of the microvm.
+	VMState *VMState `json:"vmState,omitempty"`
+
+	// FailureReason will be set in the event that there is a terminal problem
+	// reconciling the Machine and will contain a succinct value suitable
+	// for machine interpretation.
+	//
+	// This field should not be set for transitive errors that a controller
+	// faces that are expected to be fixed automatically over
+	// time (like service outages), but instead indicate that something is
+	// fundamentally wrong with the Machine's spec or the configuration of
+	// the controller, and that manual intervention is required. Examples
+	// of terminal errors would be invalid combinations of settings in the
+	// spec, values that are unsupported by the controller, or the
+	// responsible controller itself being critically misconfigured.
+	//
+	// Any transient errors that occur during the reconciliation of Machines
+	// can be added as events to the Machine object and/or logged in the
+	// controller's output.
+	// +optional
+	FailureReason *string `json:"failureReason,omitempty"`
+
+	// FailureMessage will be set in the event that there is a terminal problem
+	// reconciling the Machine and will contain a more verbose string suitable
+	// for logging and human consumption.
+	//
+	// This field should not be set for transitive errors that a controller
+	// faces that are expected to be fixed automatically over
+	// time (like service outages), but instead indicate that something is
+	// fundamentally wrong with the Machine's spec or the configuration of
+	// the controller, and that manual intervention is required. Examples
+	// of terminal errors would be invalid combinations of settings in the
+	// spec, values that are unsupported by the controller, or the
+	// responsible controller itself being critically misconfigured.
+	//
+	// Any transient errors that occur during the reconciliation of Machines
+	// can be added as events to the Machine object and/or logged in the
+	// controller's output.
+	// +optional
+	FailureMessage *string `json:"failureMessage,omitempty"`
 }
 
 //+kubebuilder:object:root=true
