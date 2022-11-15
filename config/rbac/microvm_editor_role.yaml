@@ -1,0 +1,31 @@
+# permissions for end users to edit microvms.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: microvm-editor-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: microvm-operator
+    app.kubernetes.io/part-of: microvm-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: microvm-editor-role
+rules:
+- apiGroups:
+  - infrastructure.flintlock.x-k8s.io
+  resources:
+  - microvms
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - infrastructure.flintlock.x-k8s.io
+  resources:
+  - microvms/status
+  verbs:
+  - get
