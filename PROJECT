@@ -1,0 +1,6 @@
+domain: flintlock.x-k8s.io
+layout:
+- go.kubebuilder.io/v3
+projectName: microvm-operator
+repo: github.com/weaveworks-liquidmetal/microvm-operator
+version: "3"
