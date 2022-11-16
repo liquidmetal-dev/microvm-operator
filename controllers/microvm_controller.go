@@ -207,23 +207,23 @@ func (r *MicrovmReconciler) getMicrovmService(
 		return nil, errClientFactoryFuncRequired
 	}
 
-	// token, err := mvmScope.GetBasicAuthToken(addr)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("getting basic auth token: %w", err)
-	// }
+	token, err := mvmScope.GetBasicAuthToken()
+	if err != nil {
+		return nil, fmt.Errorf("getting basic auth token: %w", err)
+	}
 
-	// tls, err := mvmScope.GetTLSConfig()
-	// if err != nil {
-	// 	return nil, fmt.Errorf("getting tls config: %w", err)
-	// }
+	tls, err := mvmScope.GetTLSConfig()
+	if err != nil {
+		return nil, fmt.Errorf("getting tls config: %w", err)
+	}
 
-	// clientOpts := []flclient.Options{
-	// 	flclient.WithProxy(machineScope.MvmCluster.Spec.MicrovmProxy),
-	// 	flclient.WithBasicAuth(token),
-	// 	flclient.WithTLS(tls),
-	// }
+	clientOpts := []flclient.Options{
+		flclient.WithProxy(mvmScope.MicroVM.Spec.MicrovmProxy),
+		flclient.WithBasicAuth(token),
+		flclient.WithTLS(tls),
+	}
 
-	client, err := r.MvmClientFunc(mvmScope.MicroVM.Spec.Host.Endpoint, []flclient.Options{}...)
+	client, err := r.MvmClientFunc(mvmScope.MicroVM.Spec.Host.Endpoint, clientOpts...)
 	if err != nil {
 		return nil, fmt.Errorf("creating microvm client: %w", err)
 	}

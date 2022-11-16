@@ -130,6 +130,18 @@ type Host struct {
 	// including the port.
 	// +kubebuilder:validation:Required
 	Endpoint string `json:"endpoint"`
+	// BasicAuthSecret is the name of the secret containing basic auth info for the host
+	// The secret should be created in the same namespace as the MicroVM.
+	//
+	// apiVersion: v1
+	// kind: Secret
+	// metadata:
+	//  name: mybasicauthsecret
+	//  namespace: same-as-microvm
+	// type: Opaque
+	// data:
+	//  token: YWRtaW4=
+	BasicAuthSecret string `json:"basicAuthSecret,omitempty"`
 }
 
 // TLSConfig represents config for connecting to TLS enabled hosts.

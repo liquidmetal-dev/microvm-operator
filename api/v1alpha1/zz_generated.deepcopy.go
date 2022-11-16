@@ -22,6 +22,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/weaveworks-liquidmetal/controller-pkg/client"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/cluster-api/api/v1beta1"
 )
@@ -119,6 +120,11 @@ func (in *MicrovmList) DeepCopyObject() runtime.Object {
 func (in *MicrovmSpec) DeepCopyInto(out *MicrovmSpec) {
 	*out = *in
 	out.Host = in.Host
+	if in.MicrovmProxy != nil {
+		in, out := &in.MicrovmProxy, &out.MicrovmProxy
+		*out = new(client.Proxy)
+		**out = **in
+	}
 	in.VMSpec.DeepCopyInto(&out.VMSpec)
 	if in.UserData != nil {
 		in, out := &in.UserData, &out.UserData

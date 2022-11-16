@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	flclient "github.com/weaveworks-liquidmetal/controller-pkg/client"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 )
@@ -32,6 +33,9 @@ type MicrovmSpec struct {
 	// Host sets the host device address for Microvm creation.
 	// +kubebuilder:validation:Required
 	Host Host `json:"host"`
+	// MicrovmProxy is the proxy server details to use when calling the microvm service. This is an
+	// alternative to using the http proxy environment variables and applied purely to the grpc service.
+	MicrovmProxy *flclient.Proxy `json:"microvmProxy,omitempty"`
 	// VMSpec contains the Microvm spec.
 	// +kubebuilder:validation:Required
 	VMSpec `json:",inline"`

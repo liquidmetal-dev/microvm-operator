@@ -7,6 +7,9 @@ import (
 	"context"
 	"fmt"
 
+	flclient "github.com/weaveworks-liquidmetal/controller-pkg/client"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/types"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/cluster-api/controllers/noderefutil"
 	"sigs.k8s.io/cluster-api/util/conditions"
@@ -123,6 +126,79 @@ func (m *MicrovmScope) GetAdditionalUserData() string {
 	}
 
 	return "#!/bin/bash\necho additional user data not supplied"
+}
+
+// GetBasicAuthToken will fetch the BasicAuthSecret from the cluster
+// and return the token for the given host.
+// If no secret or no value is found, an empty string is returned.
+func (m *MicrovmScope) GetBasicAuthToken() (string, error) {
+	if m.MicroVM.Spec.Host.BasicAuthSecret == "" {
+		return "", nil
+	}
+
+	tokenSecret := &corev1.Secret{}
+	key := types.NamespacedName{
+		Name:      m.MicroVM.Spec.Host.BasicAuthSecret,
+		Namespace: m.MicroVM.Namespace,
+	}
+
+	if err := m.client.Get(m.ctx, key, tokenSecret); err != nil {
+		return "", err
+	}
+
+	// If it's not there, that's fine; we will log and return an empty string
+	token := string(tokenSecret.Data["token"])
+
+	if token == "" {
+		m.Info(
+			"basicAuthToken for host not found in secret", "secret", tokenSecret.Name,
+		)
+	}
+
+	return token, nil
+}
+
+// GetTLSConfig will fetch the TLSSecretRef and CASecretRef for the MicroVM
+// and return the TLS config for the client.
+// If either are not set, it will be assumed that the host is not
+// configured will TLS and all client calls will be made without credentials.
+func (m *MicrovmScope) GetTLSConfig() (*flclient.TLSConfig, error) {
+	if m.MicroVM.Spec.TLSSecretRef == "" {
+		m.Info("no TLS configuration found. will create insecure connection")
+
+		return nil, nil
+	}
+
+	secretKey := types.NamespacedName{
+		Name:      m.MicroVM.Spec.TLSSecretRef,
+		Namespace: m.MicroVM.Namespace,
+	}
+
+	tlsSecret := &corev1.Secret{}
+	if err := m.client.Get(context.TODO(), secretKey, tlsSecret); err != nil {
+		return nil, err
+	}
+
+	certBytes, ok := tlsSecret.Data[tlsCert]
+	if !ok {
+		return nil, &tlsError{tlsCert}
+	}
+
+	keyBytes, ok := tlsSecret.Data[tlsKey]
+	if !ok {
+		return nil, &tlsError{tlsKey}
+	}
+
+	caBytes, ok := tlsSecret.Data[caCert]
+	if !ok {
+		return nil, &tlsError{caCert}
+	}
+
+	return &flclient.TLSConfig{
+		Cert:   certBytes,
+		Key:    keyBytes,
+		CACert: caBytes,
+	}, nil
 }
 
 // SetReady sets any properties/conditions that are used to indicate that the Microvm is 'Ready'.
