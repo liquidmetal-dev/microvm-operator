@@ -120,6 +120,11 @@ func (in *MicrovmSpec) DeepCopyInto(out *MicrovmSpec) {
 	*out = *in
 	out.Host = in.Host
 	in.VMSpec.DeepCopyInto(&out.VMSpec)
+	if in.UserData != nil {
+		in, out := &in.UserData, &out.UserData
+		*out = new(string)
+		**out = **in
+	}
 	if in.SSHPublicKeys != nil {
 		in, out := &in.SSHPublicKeys, &out.SSHPublicKeys
 		*out = make([]SSHPublicKey, len(*in))

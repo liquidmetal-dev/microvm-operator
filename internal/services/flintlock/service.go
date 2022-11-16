@@ -118,16 +118,11 @@ func (s *Service) Dispose() {
 }
 
 func (s *Service) addMetadata(apiMicroVM *flintlocktypes.MicroVMSpec) error {
-	// bootstrapData, err := s.scope.GetRawBootstrapData()
-	// if err != nil {
-	// 	return fmt.Errorf("getting bootstrap data for machine: %w", err)
-	// }
-
-	apiMicroVM.Metadata["user-data"] = "#!/bin/bash\n echo foo" //base64.StdEncoding.EncodeToString(bootstrapData)
+	apiMicroVM.Metadata["user-data"] = s.scope.GetAdditionalUserData()
 
 	vendorData, err := s.createVendorData()
 	if err != nil {
-		return fmt.Errorf("creating vendor data for machine: %w", err)
+		return fmt.Errorf("creating vendor data for microvm: %w", err)
 	}
 
 	apiMicroVM.Metadata["vendor-data"] = vendorData

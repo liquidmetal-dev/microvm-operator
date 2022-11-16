@@ -16,6 +16,9 @@ spec:
   - user: "root"
     authorizedKeys:
     - "ssh-ed25519 foobar"
+  userdata: |
+    #!/bin/bash
+    echo "hi from my microvm!"
   kernel:
     filename: boot/vmlinux
     image: ghcr.io/weaveworks-liquidmetal/flintlock-kernel:5.10.77

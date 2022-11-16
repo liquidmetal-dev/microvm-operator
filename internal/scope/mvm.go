@@ -116,6 +116,15 @@ func (m *MicrovmScope) GetSSHPublicKeys() []infrav1.SSHPublicKey {
 	return nil
 }
 
+// GetAdditionalUserData will return any scripts intended to run on the microvm
+func (m *MicrovmScope) GetAdditionalUserData() string {
+	if m.MicroVM.Spec.UserData != nil {
+		return *m.MicroVM.Spec.UserData
+	}
+
+	return "#!/bin/bash\necho additional user data not supplied"
+}
+
 // SetReady sets any properties/conditions that are used to indicate that the Microvm is 'Ready'.
 func (m *MicrovmScope) SetReady() {
 	conditions.MarkTrue(m.MicroVM, infrav1.MicrovmReadyCondition)

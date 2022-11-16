@@ -35,6 +35,22 @@ type MicrovmSpec struct {
 	// VMSpec contains the Microvm spec.
 	// +kubebuilder:validation:Required
 	VMSpec `json:",inline"`
+	// UserData is additional userdata script to execute in the Microvm's cloud init.
+	// This can be in the form of a raw shell script, eg:
+	// userdata: |
+	//   #!/bin/bash
+	//   echo "hi from my microvm"
+	//
+	// or in valid cloud-config, eg:
+	// userdata: |
+	// 	#cloud-config
+	// 	write_files:
+	// 	- content: "hello"
+	// 		path: "/root/FINDME"
+	// 		owner: "root:root"
+	// 		permissions: "0755"
+	// +optional
+	UserData *string `json:"userdata"`
 	// SSHPublicKeys is list of SSH public keys which will be added to the Microvm.
 	// +optional
 	SSHPublicKeys []SSHPublicKey `json:"sshPublicKeys,omitempty"`

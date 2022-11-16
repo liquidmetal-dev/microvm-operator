@@ -176,6 +176,14 @@ spec:
                   -----END EC PRIVATE KEY----- ca.crt: | -----BEGIN CERTIFICATE-----
                   MIIEpgIBAAKCAQEA7yn3bRHQ5FHMQ ... -----END CERTIFICATE-----"
                 type: string
+              userdata:
+                description: "UserData is additional userdata script to execute in
+                  the Microvm's cloud init. This can be in the form of a raw shell
+                  script, eg: userdata: | #!/bin/bash echo \"hi from my microvm\"
+                  \n or in valid cloud-config, eg: userdata: | #cloud-config write_files:
+                  - content: \"hello\" path: \"/root/FINDME\" owner: \"root:root\"
+                  permissions: \"0755\""
+                type: string
               vcpu:
                 description: VCPU specifies how many vcpu's the microvm will be allocated.
                 format: int64
