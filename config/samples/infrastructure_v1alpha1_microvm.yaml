@@ -9,4 +9,22 @@ metadata:
     app.kubernetes.io/created-by: microvm-operator
   name: microvm-sample
 spec:
-  # TODO(user): Add fields here
+  host:
+    name: host1
+    endpoint: 1.2.3.4:9090
+  sshPublicKeys:
+  - user: "root"
+    authorizedKeys:
+    - "ssh-ed25519 foobar"
+  kernel:
+    filename: boot/vmlinux
+    image: ghcr.io/weaveworks-liquidmetal/flintlock-kernel:5.10.77
+  kernelCmdline: {}
+  memoryMb: 2048
+  vcpu: 2
+  networkInterfaces:
+  - guestDeviceName: eth1
+    type: macvtap
+  rootVolume:
+    id: root
+    image: ghcr.io/weaveworks-liquidmetal/capmvm-kubernetes:1.21.8

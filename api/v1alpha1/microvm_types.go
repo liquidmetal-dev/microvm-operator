@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 )
 
 const (
@@ -70,6 +71,8 @@ type MicrovmSpec struct {
 	// 		-----END CERTIFICATE-----
 	// +optional
 	TLSSecretRef string `json:"tlsSecretRef,omitempty"`
+	// ProviderID is the unique identifier as specified by the cloud provider.
+	ProviderID *string `json:"providerID,omitempty"`
 }
 
 // MicrovmStatus defines the observed state of Microvm
@@ -119,6 +122,9 @@ type MicrovmStatus struct {
 	// controller's output.
 	// +optional
 	FailureMessage *string `json:"failureMessage,omitempty"`
+	// Conditions defines current service state of the Microvm.
+	// +optional
+	Conditions clusterv1.Conditions `json:"conditions,omitempty"`
 }
 
 //+kubebuilder:object:root=true
@@ -144,4 +150,14 @@ type MicrovmList struct {
 
 func init() {
 	SchemeBuilder.Register(&Microvm{}, &MicrovmList{})
+}
+
+// GetConditions returns the observations of the operational state of the MicrovmMachine resource.
+func (r *Microvm) GetConditions() clusterv1.Conditions {
+	return r.Status.Conditions
+}
+
+// SetConditions sets the underlying service state of the MicrovmMachine to the predescribed clusterv1.Conditions.
+func (r *Microvm) SetConditions(conditions clusterv1.Conditions) {
+	r.Status.Conditions = conditions
 }
