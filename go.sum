@@ -361,6 +361,8 @@ github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.7.1 h1:5TQK59W5E3v0r2duFAb7P95B6hEeOyEnHRa8MjYSMTY=
+github.com/weaveworks-liquidmetal/controller-pkg v0.0.0-20221116160540-da5b1f3c50ba h1:q3Uw/ySFfEYmppzPJySqYuoPWoVV2FTdIaC8QF9dElQ=
+github.com/weaveworks-liquidmetal/controller-pkg v0.0.0-20221116160540-da5b1f3c50ba/go.mod h1:MXYllufdN11S1Ou1YhNsISQ7e4YHeiKDUpOjMBCSOJY=
 github.com/weaveworks-liquidmetal/flintlock/api v0.0.0-20221108110312-4cf137879fb2 h1:6BACjW2rZrpWvzK+T7sQ0dn0LOWw8u8LduoTkan58Ts=
 github.com/weaveworks-liquidmetal/flintlock/api v0.0.0-20221108110312-4cf137879fb2/go.mod h1:JPML9O56MoPKGX97jfj++BtuFFS84jm4T+jWQBjO5Uc=
 github.com/weaveworks-liquidmetal/flintlock/client v0.0.0-20221108110312-4cf137879fb2 h1:lC8NG5ka+MSXktrSgpmiDKvkr5kVB62vcWhU1XRahk4=
@@ -766,8 +768,8 @@ google.golang.org/grpc v1.39.0/go.mod h1:PImNr+rS9TWYb2O4/emRugxiyHZ5JyHW5F+RPnD
 google.golang.org/grpc v1.39.1/go.mod h1:PImNr+rS9TWYb2O4/emRugxiyHZ5JyHW5F+RPnDzfrE=
 google.golang.org/grpc v1.40.0/go.mod h1:ogyxbiOoUXAkP+4+xa6PZSE9DZgIHtSpzjDTB9KAK34=
 google.golang.org/grpc v1.46.0/go.mod h1:vN9eftEi1UMyUsIF80+uQXhHjbXYbm0uXoFCACuMGWk=
-google.golang.org/grpc v1.48.0 h1:rQOsyJ/8+ufEDJd/Gdsz7HG220Mh9HAhFHRGnIjda0w=
-google.golang.org/grpc v1.48.0/go.mod h1:vN9eftEi1UMyUsIF80+uQXhHjbXYbm0uXoFCACuMGWk=
+google.golang.org/grpc v1.50.1 h1:DS/BukOZWp8s6p4Dt/tOaJaTQyPyOoCcrjroHuCeLzY=
+google.golang.org/grpc v1.50.1/go.mod h1:ZgQEeidpAuNRZ8iRrlBKXZQP1ghovWIVhdJRyCDK+GI=
 google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0/go.mod h1:6Kw0yEErY5E/yWrBtf03jp27GLLJujG4z/JK95pnjjw=
 google.golang.org/protobuf v0.0.0-20200109180630-ec00e32a8dfd/go.mod h1:DFci5gLYBciE7Vtevhsrf46CRTquxDuWsQurQQe4oz8=
 google.golang.org/protobuf v0.0.0-20200221191635-4d8936d0db64/go.mod h1:kwYJMbMJ01Woi6D6+Kah6886xMZcty6N08ah7+eCXa0=

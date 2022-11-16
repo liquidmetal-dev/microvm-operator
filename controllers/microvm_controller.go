@@ -22,6 +22,7 @@ import (
 	"strings"
 	"time"
 
+	flclient "github.com/weaveworks-liquidmetal/controller-pkg/client"
 	flintlocktypes "github.com/weaveworks-liquidmetal/flintlock/api/types"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -32,7 +33,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	infrav1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
-	flclient "github.com/weaveworks-liquidmetal/microvm-operator/internal/client"
 	"github.com/weaveworks-liquidmetal/microvm-operator/internal/scope"
 	"github.com/weaveworks-liquidmetal/microvm-operator/internal/services/flintlock"
 )

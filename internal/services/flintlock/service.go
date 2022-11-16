@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"fmt"
 
+	flclient "github.com/weaveworks-liquidmetal/controller-pkg/client"
 	flintlockv1 "github.com/weaveworks-liquidmetal/flintlock/api/services/microvm/v1alpha1"
 	flintlocktypes "github.com/weaveworks-liquidmetal/flintlock/api/types"
 	"github.com/weaveworks-liquidmetal/flintlock/client/cloudinit/instance"
@@ -24,19 +25,14 @@ const (
 	cloudInitHeader = "#cloud-config\n"
 )
 
-type Client interface {
-	flintlockv1.MicroVMClient
-	Dispose()
-}
-
 type Service struct {
 	scope *scope.MicrovmScope
 
-	client Client
+	client flclient.Client
 	hostID string
 }
 
-func New(scope *scope.MicrovmScope, client Client, hostID string) *Service {
+func New(scope *scope.MicrovmScope, client flclient.Client, hostID string) *Service {
 	return &Service{
 		scope:  scope,
 		client: client,
@@ -114,7 +110,7 @@ func (s *Service) Delete(ctx context.Context) (*emptypb.Empty, error) {
 }
 
 func (s *Service) Dispose() {
-	s.client.Dispose()
+	s.client.Close()
 }
 
 func (s *Service) addMetadata(apiMicroVM *flintlocktypes.MicroVMSpec) error {

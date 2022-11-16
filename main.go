@@ -31,9 +31,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	"github.com/weaveworks-liquidmetal/controller-pkg/client"
 	infrastructurev1alpha1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
 	"github.com/weaveworks-liquidmetal/microvm-operator/controllers"
-	"github.com/weaveworks-liquidmetal/microvm-operator/internal/client"
 	//+kubebuilder:scaffold:imports
 )
 
