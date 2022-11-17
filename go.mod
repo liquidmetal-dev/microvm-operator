@@ -2,22 +2,17 @@ module github.com/weaveworks-liquidmetal/microvm-operator
 
 go 1.19
 
-// replace github.com/weaveworks-liquidmetal/controller-pkg => /home/claudia/workspace/lm/controller-pkg
-
 require (
 	github.com/go-logr/logr v1.2.3
 	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.20.0
-	github.com/weaveworks-liquidmetal/controller-pkg v0.0.0-20221116160540-da5b1f3c50ba
+	github.com/weaveworks-liquidmetal/controller-pkg/client v0.0.0-20221117135625-e87f6fda7332
+	github.com/weaveworks-liquidmetal/controller-pkg/services/microvm v0.0.0-20221117135843-0ed21d05275a
+	github.com/weaveworks-liquidmetal/controller-pkg/types/microvm v0.0.0-20221117135625-e87f6fda7332
 	github.com/weaveworks-liquidmetal/flintlock/api v0.0.0-20221108110312-4cf137879fb2
-	github.com/weaveworks-liquidmetal/flintlock/client v0.0.0-20221108110312-4cf137879fb2
-	github.com/yitsushi/macpot v1.0.2
-	google.golang.org/protobuf v1.28.1
-	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.25.0
 	k8s.io/apimachinery v0.25.0
 	k8s.io/client-go v0.25.0
-	k8s.io/utils v0.0.0-20220728103510-ee6ede2d64ed
 	sigs.k8s.io/cluster-api v1.2.5
 	sigs.k8s.io/controller-runtime v0.13.0
 )
@@ -67,6 +62,8 @@ require (
 	github.com/prometheus/common v0.32.1 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/weaveworks-liquidmetal/flintlock/client v0.0.0-20221108110312-4cf137879fb2 // indirect
+	github.com/yitsushi/macpot v1.0.2 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
@@ -81,12 +78,15 @@ require (
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20220519153652-3a47de7e79bd // indirect
 	google.golang.org/grpc v1.50.1 // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/apiextensions-apiserver v0.25.0 // indirect
 	k8s.io/component-base v0.25.0 // indirect
-	k8s.io/klog/v2 v2.70.1 // indirect
+	k8s.io/klog/v2 v2.80.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20220803162953-67bda5d908f1 // indirect
+	k8s.io/utils v0.0.0-20221108210102-8e77b1f39fe2 // indirect
 	sigs.k8s.io/json v0.0.0-20220713155537-f223a00ba0e2 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect

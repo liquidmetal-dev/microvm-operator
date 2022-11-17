@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	flclient "github.com/weaveworks-liquidmetal/controller-pkg/client"
+	microvm "github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 )
@@ -32,13 +33,13 @@ const (
 type MicrovmSpec struct {
 	// Host sets the host device address for Microvm creation.
 	// +kubebuilder:validation:Required
-	Host Host `json:"host"`
+	Host microvm.Host `json:"host"`
 	// MicrovmProxy is the proxy server details to use when calling the microvm service. This is an
 	// alternative to using the http proxy environment variables and applied purely to the grpc service.
 	MicrovmProxy *flclient.Proxy `json:"microvmProxy,omitempty"`
 	// VMSpec contains the Microvm spec.
 	// +kubebuilder:validation:Required
-	VMSpec `json:",inline"`
+	microvm.VMSpec `json:",inline"`
 	// UserData is additional userdata script to execute in the Microvm's cloud init.
 	// This can be in the form of a raw shell script, eg:
 	// userdata: |
@@ -57,7 +58,7 @@ type MicrovmSpec struct {
 	UserData *string `json:"userdata"`
 	// SSHPublicKeys is list of SSH public keys which will be added to the Microvm.
 	// +optional
-	SSHPublicKeys []SSHPublicKey `json:"sshPublicKeys,omitempty"`
+	SSHPublicKeys []microvm.SSHPublicKey `json:"sshPublicKeys,omitempty"`
 	// mTLS Configuration:
 	//
 	// It is recommended that each flintlock host is configured with its own cert
@@ -103,7 +104,7 @@ type MicrovmStatus struct {
 	Ready bool `json:"ready"`
 
 	// VMState indicates the state of the microvm.
-	VMState *VMState `json:"vmState,omitempty"`
+	VMState *microvm.VMState `json:"vmState,omitempty"`
 
 	// FailureReason will be set in the event that there is a terminal problem
 	// reconciling the Machine and will contain a succinct value suitable

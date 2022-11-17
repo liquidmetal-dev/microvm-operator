@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	flclient "github.com/weaveworks-liquidmetal/controller-pkg/client"
+	microvm "github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
@@ -94,6 +95,11 @@ func (m *MicrovmScope) GetInstanceID() string {
 	return parsed.ID()
 }
 
+// GetMicrovmSpec returns the spec for the MicroVM
+func (m *MicrovmScope) GetMicrovmSpec() microvm.VMSpec {
+	return m.MicroVM.Spec.VMSpec
+}
+
 // SetProviderID saves the unique microvm and object ID to the Mvm spec.
 func (m *MicrovmScope) SetProviderID(mvmUID string) {
 	providerID := fmt.Sprintf("%s%s/%s", ProviderPrefix, m.MicroVM.Spec.Host.Endpoint, mvmUID)
@@ -111,7 +117,7 @@ func (m *MicrovmScope) GetProviderID() string {
 }
 
 // GetSSHPublicKeys will return the SSH public keys for this vm.
-func (m *MicrovmScope) GetSSHPublicKeys() []infrav1.SSHPublicKey {
+func (m *MicrovmScope) GetSSHPublicKeys() []microvm.SSHPublicKey {
 	if len(m.MicroVM.Spec.SSHPublicKeys) != 0 {
 		return m.MicroVM.Spec.SSHPublicKeys
 	}
@@ -119,8 +125,8 @@ func (m *MicrovmScope) GetSSHPublicKeys() []infrav1.SSHPublicKey {
 	return nil
 }
 
-// GetAdditionalUserData will return any scripts intended to run on the microvm
-func (m *MicrovmScope) GetAdditionalUserData() string {
+// GetRawBootstrapData will return any scripts intended to run on the microvm
+func (m *MicrovmScope) GetRawBootstrapData() string {
 	if m.MicroVM.Spec.UserData != nil {
 		return *m.MicroVM.Spec.UserData
 	}
@@ -164,7 +170,7 @@ func (m *MicrovmScope) GetBasicAuthToken() (string, error) {
 // configured will TLS and all client calls will be made without credentials.
 func (m *MicrovmScope) GetTLSConfig() (*flclient.TLSConfig, error) {
 	if m.MicroVM.Spec.TLSSecretRef == "" {
-		m.Info("no TLS configuration found. will create insecure connection")
+		m.V(2).Info("no TLS configuration found. will create insecure connection")
 
 		return nil, nil
 	}

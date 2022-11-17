@@ -23,6 +23,8 @@ import (
 	"time"
 
 	flclient "github.com/weaveworks-liquidmetal/controller-pkg/client"
+	flservice "github.com/weaveworks-liquidmetal/controller-pkg/services/microvm"
+	"github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
 	flintlocktypes "github.com/weaveworks-liquidmetal/flintlock/api/types"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -34,7 +36,6 @@ import (
 
 	infrav1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
 	"github.com/weaveworks-liquidmetal/microvm-operator/internal/scope"
-	"github.com/weaveworks-liquidmetal/microvm-operator/internal/services/flintlock"
 )
 
 const (
@@ -96,40 +97,41 @@ func (r *MicrovmReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 func (r *MicrovmReconciler) reconcileDelete(
 	ctx context.Context,
-	machineScope *scope.MicrovmScope,
+	mvmScope *scope.MicrovmScope,
 ) (reconcile.Result, error) {
-	machineScope.Info("Reconciling MicrovmMachine delete")
+	mvmScope.Info("Reconciling MicrovmMachine delete")
 
-	mvmSvc, err := r.getMicrovmService(machineScope)
+	mvmSvc, err := r.getMicrovmService(mvmScope)
 	if err != nil {
-		machineScope.Error(err, "failed to get microvm service")
+		mvmScope.Error(err, "failed to get microvm service")
 
 		return ctrl.Result{}, nil
 	}
-	defer mvmSvc.Dispose()
+	defer mvmSvc.Close()
 
+	mvmScope.Info("getting microvm", "name", mvmScope.Name())
 	microvm, err := mvmSvc.Get(ctx)
 	if err != nil && !strings.Contains(err.Error(), "not found") {
-		machineScope.Error(err, "failed getting microvm")
+		mvmScope.Error(err, "failed getting microvm")
 
 		return ctrl.Result{}, fmt.Errorf("failed getting microvm: %w", err)
 	}
 
 	if microvm != nil {
-		machineScope.Info("deleting microvm")
+		mvmScope.Info("deleting microvm", "name", mvmScope.Name())
 
 		// Mark the machine as no longer ready before we delete.
-		machineScope.SetNotReady(infrav1.MicrovmDeletingReason, "Info", "")
+		mvmScope.SetNotReady(infrav1.MicrovmDeletingReason, "Info", "")
 
-		if err := machineScope.Patch(); err != nil {
-			machineScope.Error(err, "failed to patch object")
+		if err := mvmScope.Patch(); err != nil {
+			mvmScope.Error(err, "failed to patch object")
 
 			return ctrl.Result{}, err
 		}
 
 		if microvm.Status.State != flintlocktypes.MicroVMStatus_DELETING {
 			if _, err := mvmSvc.Delete(ctx); err != nil {
-				machineScope.SetNotReady(infrav1.MicrovmDeleteFailedReason, "Error", "")
+				mvmScope.SetNotReady(infrav1.MicrovmDeleteFailedReason, "Error", "")
 
 				return ctrl.Result{}, err
 			}
@@ -140,8 +142,8 @@ func (r *MicrovmReconciler) reconcileDelete(
 
 	// By this point Flintlock has no record of the MvM, so we are good to clear
 	// the finalizer
-	controllerutil.RemoveFinalizer(machineScope.MicroVM, infrav1.MvmFinalizer)
-	machineScope.Info("microvm deleted")
+	controllerutil.RemoveFinalizer(mvmScope.MicroVM, infrav1.MvmFinalizer)
+	mvmScope.Info("microvm deleted", "name", mvmScope.Name())
 
 	return ctrl.Result{}, nil
 }
@@ -156,7 +158,7 @@ func (r *MicrovmReconciler) reconcileNormal(
 
 		return ctrl.Result{}, err
 	}
-	defer mvmSvc.Dispose()
+	defer mvmSvc.Close()
 
 	var microvm *flintlocktypes.MicroVM
 
@@ -175,24 +177,26 @@ func (r *MicrovmReconciler) reconcileNormal(
 	controllerutil.AddFinalizer(mvmScope.MicroVM, infrav1.MvmFinalizer)
 
 	if err := mvmScope.Patch(); err != nil {
-		mvmScope.Error(err, "unable to patch microvm machine")
+		mvmScope.Error(err, "unable to patch microvm")
 
 		return ctrl.Result{}, err
 	}
 
 	if microvm == nil {
-		mvmScope.Info("creating microvm")
+		mvmScope.Info("creating microvm", "name", mvmScope.Name())
 
 		microvm, err = mvmSvc.Create(ctx)
 		if err != nil {
 			return ctrl.Result{}, err
 		}
+
+		mvmScope.Info("microvm created", "name", mvmScope.Name())
 	}
 
 	mvmScope.SetProviderID(*microvm.Spec.Uid)
 
 	if err := mvmScope.Patch(); err != nil {
-		mvmScope.Error(err, "unable to patch microvm machine")
+		mvmScope.Error(err, "unable to patch microvm")
 
 		return ctrl.Result{}, err
 	}
@@ -202,7 +206,7 @@ func (r *MicrovmReconciler) reconcileNormal(
 
 func (r *MicrovmReconciler) getMicrovmService(
 	mvmScope *scope.MicrovmScope,
-) (*flintlock.Service, error) {
+) (*flservice.Service, error) {
 	if r.MvmClientFunc == nil {
 		return nil, errClientFactoryFuncRequired
 	}
@@ -228,7 +232,7 @@ func (r *MicrovmReconciler) getMicrovmService(
 		return nil, fmt.Errorf("creating microvm client: %w", err)
 	}
 
-	return flintlock.New(mvmScope, client, mvmScope.MicroVM.Spec.Host.Endpoint), nil
+	return flservice.New(mvmScope, client, mvmScope.MicroVM.Spec.Host.Endpoint), nil
 }
 
 func (r *MicrovmReconciler) parseMicroVMState(
@@ -238,7 +242,7 @@ func (r *MicrovmReconciler) parseMicroVMState(
 	switch state {
 	// ALL DONE \o/
 	case flintlocktypes.MicroVMStatus_CREATED:
-		mvmScope.MicroVM.Status.VMState = &infrav1.VMStateRunning
+		mvmScope.MicroVM.Status.VMState = &microvm.VMStateRunning
 		mvmScope.V(2).Info("microvm is in created state")
 		mvmScope.Info("microvm created", "name", mvmScope.Name(), "UID", mvmScope.GetInstanceID())
 		mvmScope.SetReady()
@@ -246,14 +250,14 @@ func (r *MicrovmReconciler) parseMicroVMState(
 		return reconcile.Result{}, nil
 	// MVM IS PENDING
 	case flintlocktypes.MicroVMStatus_PENDING:
-		mvmScope.MicroVM.Status.VMState = &infrav1.VMStatePending
+		mvmScope.MicroVM.Status.VMState = &microvm.VMStatePending
 		mvmScope.SetNotReady(infrav1.MicrovmPendingReason, "Info", "")
 
 		return ctrl.Result{RequeueAfter: requeuePeriod}, nil
 	// MVM IS FAILING
 	case flintlocktypes.MicroVMStatus_FAILED:
 		// TODO: we need a failure reason from flintlock: Flintlock #299
-		mvmScope.MicroVM.Status.VMState = &infrav1.VMStateFailed
+		mvmScope.MicroVM.Status.VMState = &microvm.VMStateFailed
 		mvmScope.SetNotReady(infrav1.MicrovmProvisionFailedReason,
 			"Error",
 			errMicrovmFailed.Error(),
@@ -267,7 +271,7 @@ func (r *MicrovmReconciler) parseMicroVMState(
 		return ctrl.Result{RequeueAfter: requeuePeriod}, nil
 		// NO IDEA WHAT IS GOING ON WITH THIS MVM
 	default:
-		mvmScope.MicroVM.Status.VMState = &infrav1.VMStateUnknown
+		mvmScope.MicroVM.Status.VMState = &microvm.VMStateUnknown
 		mvmScope.SetNotReady(
 			infrav1.MicrovmUnknownStateReason,
 			"Error",
