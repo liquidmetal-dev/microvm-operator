@@ -6,9 +6,9 @@ require (
 	github.com/go-logr/logr v1.2.3
 	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.20.0
-	github.com/weaveworks-liquidmetal/controller-pkg/client v0.0.0-20221117135625-e87f6fda7332
-	github.com/weaveworks-liquidmetal/controller-pkg/services/microvm v0.0.0-20221117135843-0ed21d05275a
-	github.com/weaveworks-liquidmetal/controller-pkg/types/microvm v0.0.0-20221117135625-e87f6fda7332
+	github.com/weaveworks-liquidmetal/controller-pkg/client v0.0.0-20221118161315-83de77687232
+	github.com/weaveworks-liquidmetal/controller-pkg/services/microvm v0.0.0-20221118161315-83de77687232
+	github.com/weaveworks-liquidmetal/controller-pkg/types/microvm v0.0.0-20221118161315-83de77687232
 	github.com/weaveworks-liquidmetal/flintlock/api v0.0.0-20221108110312-4cf137879fb2
 	k8s.io/api v0.25.0
 	k8s.io/apimachinery v0.25.0

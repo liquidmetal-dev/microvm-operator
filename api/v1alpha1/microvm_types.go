@@ -33,7 +33,7 @@ const (
 type MicrovmSpec struct {
 	// Host sets the host device address for Microvm creation.
 	// +kubebuilder:validation:Required
-	Host microvm.Host `json:"host"`
+	Host HostSpec `json:"host"`
 	// MicrovmProxy is the proxy server details to use when calling the microvm service. This is an
 	// alternative to using the http proxy environment variables and applied purely to the grpc service.
 	MicrovmProxy *flclient.Proxy `json:"microvmProxy,omitempty"`
@@ -181,4 +181,22 @@ func (r *Microvm) GetConditions() clusterv1.Conditions {
 // SetConditions sets the underlying service state of the MicrovmMachine to the predescribed clusterv1.Conditions.
 func (r *Microvm) SetConditions(conditions clusterv1.Conditions) {
 	r.Status.Conditions = conditions
+}
+
+// This is temporary while I work towards something.
+type HostSpec struct {
+	// +kubebuilder:validation:Required
+	microvm.Host `json:",inline"`
+	// BasicAuthSecret is the name of the secret containing basic auth info for the host
+	// The secret should be created in the same namespace as the MicroVM.
+	//
+	// apiVersion: v1
+	// kind: Secret
+	// metadata:
+	//  name: mybasicauthsecret
+	//  namespace: same-as-microvm
+	// type: Opaque
+	// data:
+	//  token: YWRtaW4=
+	BasicAuthSecret string `json:"basicAuthSecret,omitempty"`
 }

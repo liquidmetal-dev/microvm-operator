@@ -125,13 +125,18 @@ func (m *MicrovmScope) GetSSHPublicKeys() []microvm.SSHPublicKey {
 	return nil
 }
 
+// GetLabels returns any user defined or default labels for the microvm.
+func (m *MicrovmScope) GetLabels() map[string]string {
+	return m.MicroVM.Spec.Labels
+}
+
 // GetRawBootstrapData will return any scripts intended to run on the microvm
-func (m *MicrovmScope) GetRawBootstrapData() string {
+func (m *MicrovmScope) GetRawBootstrapData() (string, error) {
 	if m.MicroVM.Spec.UserData != nil {
-		return *m.MicroVM.Spec.UserData
+		return *m.MicroVM.Spec.UserData, nil
 	}
 
-	return "#!/bin/bash\necho additional user data not supplied"
+	return "#!/bin/bash\necho additional user data not supplied", nil
 }
 
 // GetBasicAuthToken will fetch the BasicAuthSecret from the cluster

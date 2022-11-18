@@ -47,7 +47,7 @@ spec:
                     type: string
                   endpoint:
                     description: Endpoint is the API endpoint for the microvm service
-                      (i.e. flintloc) including the port.
+                      (i.e. flintlock) including the port.
                     type: string
                   name:
                     description: Name is an optional name for the host.
@@ -87,6 +87,11 @@ spec:
                 description: KernelCmdLine are the additional args to use for the
                   kernel cmdline. Each MicroVM provider has its own recommended list,
                   they will be used automatically. This field is for additional values.
+                type: object
+              labels:
+                additionalProperties:
+                  type: string
+                description: Labels allow you to include extra data on the Microvm
                 type: object
               memoryMb:
                 description: MemoryMb is the amount of memory in megabytes that the
