@@ -62,7 +62,7 @@ test: ## Run tests.
 ##@ Build
 
 .PHONY: build
-build: generate fmt vet ## Build manager binary.
+build: fmt vet ## Build manager binary.
 	go build -o bin/manager main.go
 
 .PHONY: run
@@ -151,7 +151,7 @@ $(CONTROLLER_GEN): $(LOCALBIN)
 .PHONY: counterfeiter
 counterfeiter: $(COUNTERFEITER)
 $(COUNTERFEITER): $(LOCALBIN)
-	cd $(LOCALBIN); go build -o $(subst bin/,,$@) github.com/maxbrunsfeld/counterfeiter/v6
+	cd $(LOCALBIN); go build -o . github.com/maxbrunsfeld/counterfeiter/v6
 
 .PHONY: envtest
 envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
