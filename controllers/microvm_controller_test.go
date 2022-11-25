@@ -72,7 +72,7 @@ func TestMicrovm_ReconcileNormal_VMExistsAndPending(t *testing.T) {
 	g.Expect(result.IsZero()).To(BeFalse(), "Expect a requeue to be requested")
 
 	reconciled, err := getMicrovm(client, testMicrovmName, testNamespace)
-	g.Expect(err).NotTo(HaveOccurred(), "Getting microvm machine should not fail")
+	g.Expect(err).NotTo(HaveOccurred(), "Getting microvm should not fail")
 
 	assertConditionFalse(g, reconciled, infrav1.MicrovmReadyCondition, infrav1.MicrovmPendingReason)
 	assertVMState(g, reconciled, microvm.VMStatePending)
@@ -92,7 +92,7 @@ func TestMicrovm_ReconcileNormal_VMExistsButFailed(t *testing.T) {
 	g.Expect(err).To(HaveOccurred(), "Reconciling when microvm service exists and state failed should return an error")
 
 	reconciled, err := getMicrovm(client, testMicrovmName, testNamespace)
-	g.Expect(err).NotTo(HaveOccurred(), "Getting microvm machine should not fail")
+	g.Expect(err).NotTo(HaveOccurred(), "Getting microvm should not fail")
 
 	assertConditionFalse(g, reconciled, infrav1.MicrovmReadyCondition, infrav1.MicrovmProvisionFailedReason)
 	assertVMState(g, reconciled, microvm.VMStateFailed)
@@ -112,7 +112,7 @@ func TestMicrovm_ReconcileNormal_VMExistsButUnknownState(t *testing.T) {
 	g.Expect(err).To(HaveOccurred(), "Reconciling when microvm service exists and state is unknown should return an error")
 
 	reconciled, err := getMicrovm(client, testMicrovmName, testNamespace)
-	g.Expect(err).NotTo(HaveOccurred(), "Getting microvm machine should not fail")
+	g.Expect(err).NotTo(HaveOccurred(), "Getting microvm should not fail")
 
 	assertConditionFalse(g, reconciled, infrav1.MicrovmReadyCondition, infrav1.MicrovmUnknownStateReason)
 	assertVMState(g, reconciled, microvm.VMStateUnknown)
@@ -139,7 +139,7 @@ func TestMicrovm_ReconcileNormal_NoVmCreateSucceeds(t *testing.T) {
 	g.Expect(createReq.Microvm).ToNot(BeNil())
 
 	reconciled, err := getMicrovm(client, testMicrovmName, testNamespace)
-	g.Expect(err).NotTo(HaveOccurred(), "Getting microvm machine should not fail")
+	g.Expect(err).NotTo(HaveOccurred(), "Getting microvm should not fail")
 
 	expectedProviderID := fmt.Sprintf("microvm://127.0.0.1:9090/%s", testMicrovmUID)
 	g.Expect(reconciled.Spec.ProviderID).To(Equal(pointer.String(expectedProviderID)))
@@ -204,10 +204,10 @@ func TestMicrovm_ReconcileNormal_NoVmCreateWithSSHSucceeds(t *testing.T) {
 	g := NewWithT(t)
 
 	expectedKeys := []microvm.SSHPublicKey{{
-		AuthorizedKeys: []string{"MachineSSH"},
+		AuthorizedKeys: []string{"SSH"},
 		User:           "root",
 	}, {
-		AuthorizedKeys: []string{"MachineSSH"},
+		AuthorizedKeys: []string{"SSH"},
 		User:           "ubuntu",
 	}}
 
@@ -256,7 +256,7 @@ func TestMicrovm_ReconcileNormal_NoVmCreateWithAdditionalReconcileSucceeds(t *te
 	g.Expect(err).NotTo(HaveOccurred(), "Reconciling should not return an error")
 
 	reconciled, err := getMicrovm(client, testMicrovmName, testNamespace)
-	g.Expect(err).NotTo(HaveOccurred(), "Getting microvm machine should not fail")
+	g.Expect(err).NotTo(HaveOccurred(), "Getting microvm should not fail")
 	assertMicrovmReconciled(g, reconciled)
 }
 
@@ -353,7 +353,7 @@ func TestMicrovm_ReconcileDelete_DeleteErrors(t *testing.T) {
 	g.Expect(err).To(HaveOccurred(), "Reconciling when deleting microvm errors should return error")
 
 	reconciled, err := getMicrovm(client, testMicrovmName, testNamespace)
-	g.Expect(err).NotTo(HaveOccurred(), "Getting microvm machine should not fail")
+	g.Expect(err).NotTo(HaveOccurred(), "Getting microvm should not fail")
 
 	assertConditionFalse(g, reconciled, infrav1.MicrovmReadyCondition, infrav1.MicrovmDeleteFailedReason)
 	assertMicrovmNotReady(g, reconciled)

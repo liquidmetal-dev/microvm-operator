@@ -75,9 +75,9 @@ func (r *MicrovmReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		Logger:  log,
 	})
 	if err != nil {
-		log.Error(err, "failed to create machine scope")
+		log.Error(err, "failed to create mvm scope")
 
-		return ctrl.Result{}, fmt.Errorf("failed to create machine scope: %w", err)
+		return ctrl.Result{}, fmt.Errorf("failed to create mvm scope: %w", err)
 	}
 
 	defer func() {
@@ -99,7 +99,7 @@ func (r *MicrovmReconciler) reconcileDelete(
 	ctx context.Context,
 	mvmScope *scope.MicrovmScope,
 ) (reconcile.Result, error) {
-	mvmScope.Info("Reconciling MicrovmMachine delete")
+	mvmScope.Info("Reconciling Microvm delete")
 
 	mvmSvc, err := r.getMicrovmService(mvmScope)
 	if err != nil {
@@ -120,7 +120,7 @@ func (r *MicrovmReconciler) reconcileDelete(
 	if microvm != nil {
 		mvmScope.Info("deleting microvm", "name", mvmScope.Name())
 
-		// Mark the machine as no longer ready before we delete.
+		// Mark the mvm as no longer ready before we delete.
 		mvmScope.SetNotReady(infrav1.MicrovmDeletingReason, "Info", "")
 
 		defer func() {

@@ -40,7 +40,7 @@ func TestMicrovmProviderID(t *testing.T) {
 	Expect(mvmScope.GetProviderID()).To(Equal("microvm://fd1/abcdef"))
 }
 
-func TestMachineGetInstanceID(t *testing.T) {
+func TestMicrovmGetInstanceID(t *testing.T) {
 	RegisterTestingT(t)
 
 	scheme, err := setupScheme()
@@ -63,7 +63,7 @@ func TestMachineGetInstanceID(t *testing.T) {
 }
 
 // This is all temporary
-func TestMachineGetBasicAuthToken(t *testing.T) {
+func TestMicrovmGetBasicAuthToken(t *testing.T) {
 	RegisterTestingT(t)
 
 	scheme, err := setupScheme()
@@ -150,7 +150,7 @@ func TestMachineGetBasicAuthToken(t *testing.T) {
 	}
 }
 
-func TestMachineGetTLSConfig(t *testing.T) {
+func TestMicrovmGetTLSConfig(t *testing.T) {
 	RegisterTestingT(t)
 
 	scheme, err := setupScheme()
@@ -233,14 +233,14 @@ func TestMachineGetTLSConfig(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			RegisterTestingT(t)
 			client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(tc.initObjects...).Build()
-			machineScope, err := scope.NewMicrovmScope(scope.MicrovmScopeParams{
+			mvm, err := scope.NewMicrovmScope(scope.MicrovmScopeParams{
 				Client:  client,
 				MicroVM: tc.mvm,
 				Logger:  testr.New(t),
 			})
 			Expect(err).NotTo(HaveOccurred())
 
-			tc.expected(machineScope.GetTLSConfig())
+			tc.expected(mvm.GetTLSConfig())
 		})
 	}
 }

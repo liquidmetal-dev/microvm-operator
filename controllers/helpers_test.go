@@ -170,9 +170,9 @@ func assertConditionFalse(g *WithT, from conditions.Getter, conditionType cluste
 	g.Expect(c.Reason).To(Equal(reason))
 }
 
-func assertVMState(g *WithT, machine *infrav1.Microvm, expectedState microvm.VMState) {
-	g.Expect(machine.Status.VMState).NotTo(BeNil())
-	g.Expect(*machine.Status.VMState).To(BeEquivalentTo(expectedState))
+func assertVMState(g *WithT, mvm *infrav1.Microvm, expectedState microvm.VMState) {
+	g.Expect(mvm.Status.VMState).NotTo(BeNil())
+	g.Expect(*mvm.Status.VMState).To(BeEquivalentTo(expectedState))
 }
 
 func assertMicrovmReconciled(g *WithT, reconciled *infrav1.Microvm) {
@@ -182,20 +182,20 @@ func assertMicrovmReconciled(g *WithT, reconciled *infrav1.Microvm) {
 	g.Expect(reconciled.Spec.ProviderID).ToNot(BeNil())
 	expectedProviderID := fmt.Sprintf("microvm://127.0.0.1:9090/%s", testMicrovmUID)
 	g.Expect(*reconciled.Spec.ProviderID).To(Equal(expectedProviderID))
-	g.Expect(reconciled.Status.Ready).To(BeTrue(), "The Ready property must be true when the machine has been reconciled")
+	g.Expect(reconciled.Status.Ready).To(BeTrue(), "The Ready property must be true when the mvm has been reconciled")
 }
 
 func assertFinalizer(g *WithT, reconciled *infrav1.Microvm) {
 	g.Expect(reconciled.ObjectMeta.Finalizers).NotTo(BeEmpty(), "Expected at least one finalizer to be set")
-	g.Expect(hasMicrovmFinalizer(reconciled)).To(BeTrue(), "Expect the mvm machine finalizer")
+	g.Expect(hasMicrovmFinalizer(reconciled)).To(BeTrue(), "Expect the mvm finalizer")
 }
 
-func hasMicrovmFinalizer(machine *infrav1.Microvm) bool {
-	if len(machine.ObjectMeta.Finalizers) == 0 {
+func hasMicrovmFinalizer(mvm *infrav1.Microvm) bool {
+	if len(mvm.ObjectMeta.Finalizers) == 0 {
 		return false
 	}
 
-	for _, f := range machine.ObjectMeta.Finalizers {
+	for _, f := range mvm.ObjectMeta.Finalizers {
 		if f == infrav1.MvmFinalizer {
 			return true
 		}
@@ -204,8 +204,8 @@ func hasMicrovmFinalizer(machine *infrav1.Microvm) bool {
 	return false
 }
 
-func assertMicrovmNotReady(g *WithT, machine *infrav1.Microvm) {
-	g.Expect(machine.Status.Ready).To(BeFalse())
+func assertMicrovmNotReady(g *WithT, mvm *infrav1.Microvm) {
+	g.Expect(mvm.Status.Ready).To(BeFalse())
 }
 
 func assertVendorData(g *WithT, vendorDataRaw string, expectedSSHKeys []microvm.SSHPublicKey) {

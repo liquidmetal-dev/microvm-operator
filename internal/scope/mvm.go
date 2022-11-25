@@ -60,7 +60,7 @@ func NewMicrovmScope(params MicrovmScopeParams) (*MicrovmScope, error) {
 
 	patchHelper, err := patch.NewHelper(params.MicroVM, params.Client)
 	if err != nil {
-		return nil, fmt.Errorf("creating patch helper for microvm machine: %w", err)
+		return nil, fmt.Errorf("creating patch helper for microvm: %w", err)
 	}
 
 	scope := &MicrovmScope{
