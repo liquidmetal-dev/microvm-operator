@@ -32,6 +32,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	"github.com/weaveworks-liquidmetal/controller-pkg/client"
+
 	infrastructurev1alpha1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
 	"github.com/weaveworks-liquidmetal/microvm-operator/controllers"
 	//+kubebuilder:scaffold:imports
@@ -96,6 +97,13 @@ func main() {
 		MvmClientFunc: client.NewFlintlockClient,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Microvm")
+		os.Exit(1)
+	}
+	if err = (&controllers.MicrovmReplicaSetReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "MicrovmReplicaSet")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

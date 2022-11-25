@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/go-logr/logr v1.2.3
+	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.20.0
 	github.com/weaveworks-liquidmetal/controller-pkg/client v0.0.0-20221118161315-83de77687232
 	github.com/weaveworks-liquidmetal/controller-pkg/services/microvm v0.0.0-20221118161315-83de77687232
