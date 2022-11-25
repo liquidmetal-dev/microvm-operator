@@ -159,6 +159,7 @@ func (m *MicrovmScope) GetBasicAuthToken() (string, error) {
 
 	// If it's not there, that's fine; we will log and return an empty string
 	token := string(tokenSecret.Data["token"])
+	fmt.Println(tokenSecret.Data)
 
 	if token == "" {
 		m.Info(
@@ -186,7 +187,7 @@ func (m *MicrovmScope) GetTLSConfig() (*flclient.TLSConfig, error) {
 	}
 
 	tlsSecret := &corev1.Secret{}
-	if err := m.client.Get(context.TODO(), secretKey, tlsSecret); err != nil {
+	if err := m.client.Get(m.ctx, secretKey, tlsSecret); err != nil {
 		return nil, err
 	}
 
