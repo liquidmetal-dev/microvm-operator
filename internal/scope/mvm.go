@@ -143,13 +143,13 @@ func (m *MicrovmScope) GetRawBootstrapData() (string, error) {
 // and return the token for the given host.
 // If no secret or no value is found, an empty string is returned.
 func (m *MicrovmScope) GetBasicAuthToken() (string, error) {
-	if m.MicroVM.Spec.Host.BasicAuthSecret == "" {
+	if m.MicroVM.Spec.BasicAuthSecret == "" {
 		return "", nil
 	}
 
 	tokenSecret := &corev1.Secret{}
 	key := types.NamespacedName{
-		Name:      m.MicroVM.Spec.Host.BasicAuthSecret,
+		Name:      m.MicroVM.Spec.BasicAuthSecret,
 		Namespace: m.MicroVM.Namespace,
 	}
 

@@ -33,10 +33,7 @@ const (
 type MicrovmSpec struct {
 	// Host sets the host device address for Microvm creation.
 	// +kubebuilder:validation:Required
-	Host HostSpec `json:"host"`
-	// MicrovmProxy is the proxy server details to use when calling the microvm service. This is an
-	// alternative to using the http proxy environment variables and applied purely to the grpc service.
-	MicrovmProxy *flclient.Proxy `json:"microvmProxy,omitempty"`
+	microvm.Host `json:",inline"`
 	// VMSpec contains the Microvm spec.
 	// +kubebuilder:validation:Required
 	microvm.VMSpec `json:",inline"`
@@ -59,6 +56,8 @@ type MicrovmSpec struct {
 	// SSHPublicKeys is list of SSH public keys which will be added to the Microvm.
 	// +optional
 	SSHPublicKeys []microvm.SSHPublicKey `json:"sshPublicKeys,omitempty"`
+	// TODO this needs to go and be pulled off the owning object
+	// probably needs to be part of Hosts once that becomes an array
 	// mTLS Configuration:
 	//
 	// It is recommended that each flintlock host is configured with its own cert
@@ -92,8 +91,26 @@ type MicrovmSpec struct {
 	// 		-----END CERTIFICATE-----
 	// +optional
 	TLSSecretRef string `json:"tlsSecretRef,omitempty"`
+	// TODO this needs to go and be pulled off the owning object
+	// probably needs to be part of Hosts once that becomes an array
+	// BasicAuthSecret is the name of the secret containing basic auth info for the host
+	// The secret should be created in the same namespace as the MicroVM.
+	//
+	// apiVersion: v1
+	// kind: Secret
+	// metadata:
+	//  name: mybasicauthsecret
+	//  namespace: same-as-microvm
+	// type: Opaque
+	// data:
+	//  token: YWRtaW4=
+	BasicAuthSecret string `json:"basicAuthSecret,omitempty"`
 	// ProviderID is the unique identifier as specified by the cloud provider.
+	// Do not supply this field as a user.
 	ProviderID *string `json:"providerID,omitempty"`
+	// MicrovmProxy is the proxy server details to use when calling the microvm service. This is an
+	// alternative to using the http proxy environment variables and applied purely to the grpc service.
+	MicrovmProxy *flclient.Proxy `json:"microvmProxy,omitempty"`
 }
 
 // MicrovmStatus defines the observed state of Microvm
@@ -181,22 +198,4 @@ func (r *Microvm) GetConditions() clusterv1.Conditions {
 // SetConditions sets the underlying service state of the MicrovmMachine to the predescribed clusterv1.Conditions.
 func (r *Microvm) SetConditions(conditions clusterv1.Conditions) {
 	r.Status.Conditions = conditions
-}
-
-// This is temporary while I work towards something.
-type HostSpec struct {
-	// +kubebuilder:validation:Required
-	microvm.Host `json:",inline"`
-	// BasicAuthSecret is the name of the secret containing basic auth info for the host
-	// The secret should be created in the same namespace as the MicroVM.
-	//
-	// apiVersion: v1
-	// kind: Secret
-	// metadata:
-	//  name: mybasicauthsecret
-	//  namespace: same-as-microvm
-	// type: Opaque
-	// data:
-	//  token: YWRtaW4=
-	BasicAuthSecret string `json:"basicAuthSecret,omitempty"`
 }

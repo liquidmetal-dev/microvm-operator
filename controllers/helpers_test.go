@@ -95,8 +95,8 @@ func createMicrovm() *infrav1.Microvm {
 			Namespace: testNamespace,
 		},
 		Spec: infrav1.MicrovmSpec{
-			Host: infrav1.HostSpec{
-				Host: microvm.Host{Endpoint: "127.0.0.1:9090"},
+			Host: microvm.Host{
+				Endpoint: "127.0.0.1:9090",
 			},
 			ProviderID: pointer.String(testMicrovmUID),
 			VMSpec: microvm.VMSpec{

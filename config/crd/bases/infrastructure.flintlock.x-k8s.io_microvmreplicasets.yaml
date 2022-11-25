@@ -35,6 +35,13 @@ spec:
           spec:
             description: MicrovmReplicaSetSpec defines the desired state of MicrovmReplicaSet
             properties:
+              endpoint:
+                description: Endpoint is the API endpoint for the microvm service
+                  (i.e. flintlock) including the port.
+                type: string
+              name:
+                description: Name is an optional name for the host.
+                type: string
               replicas:
                 default: 1
                 description: Replicas is the number of Microvms to create on the given
@@ -55,28 +62,19 @@ spec:
                   spec:
                     description: Specification of the desired behavior of the Microvm.
                     properties:
-                      host:
-                        description: Host sets the host device address for Microvm
-                          creation.
-                        properties:
-                          basicAuthSecret:
-                            description: "BasicAuthSecret is the name of the secret
-                              containing basic auth info for the host The secret should
-                              be created in the same namespace as the MicroVM. \n
-                              apiVersion: v1 kind: Secret metadata: name: mybasicauthsecret
-                              namespace: same-as-microvm type: Opaque data: token:
-                              YWRtaW4="
-                            type: string
-                          endpoint:
-                            description: Endpoint is the API endpoint for the microvm
-                              service (i.e. flintlock) including the port.
-                            type: string
-                          name:
-                            description: Name is an optional name for the host.
-                            type: string
-                        required:
-                        - endpoint
-                        type: object
+                      basicAuthSecret:
+                        description: "TODO this needs to go and be pulled off the
+                          owning object probably needs to be part of Hosts once that
+                          becomes an array BasicAuthSecret is the name of the secret
+                          containing basic auth info for the host The secret should
+                          be created in the same namespace as the MicroVM. \n apiVersion:
+                          v1 kind: Secret metadata: name: mybasicauthsecret namespace:
+                          same-as-microvm type: Opaque data: token: YWRtaW4="
+                        type: string
+                      endpoint:
+                        description: Endpoint is the API endpoint for the microvm
+                          service (i.e. flintlock) including the port.
+                        type: string
                       initrd:
                         description: Initrd is an optional initial ramdisk to use.
                         properties:
@@ -136,6 +134,9 @@ spec:
                         required:
                         - endpoint
                         type: object
+                      name:
+                        description: Name is an optional name for the host.
+                        type: string
                       networkInterfaces:
                         description: NetworkInterfaces specifies the network interfaces
                           attached to the microvm.
@@ -172,7 +173,7 @@ spec:
                         type: array
                       providerID:
                         description: ProviderID is the unique identifier as specified
-                          by the cloud provider.
+                          by the cloud provider. Do not supply this field as a user.
                         type: string
                       rootVolume:
                         description: RootVolume specifies the volume to use for the
@@ -212,9 +213,11 @@ spec:
                           type: object
                         type: array
                       tlsSecretRef:
-                        description: "mTLS Configuration: \n It is recommended that
-                          each flintlock host is configured with its own cert signed
-                          by a common CA, and set to use mTLS. The flintlock-operator
+                        description: "TODO this needs to go and be pulled off the
+                          owning object probably needs to be part of Hosts once that
+                          becomes an array mTLS Configuration: \n It is recommended
+                          that each flintlock host is configured with its own cert
+                          signed by a common CA, and set to use mTLS. The flintlock-operator
                           should be provided with the CA, and a client cert and key
                           signed by that CA. TLSSecretRef is a reference to the name
                           of a secret which contains TLS cert information for connecting
@@ -268,7 +271,7 @@ spec:
                           type: object
                         type: array
                     required:
-                    - host
+                    - endpoint
                     - kernel
                     - memoryMb
                     - networkInterfaces
@@ -276,6 +279,8 @@ spec:
                     - vcpu
                     type: object
                 type: object
+            required:
+            - endpoint
             type: object
           status:
             description: MicrovmReplicaSetStatus defines the observed state of MicrovmReplicaSet

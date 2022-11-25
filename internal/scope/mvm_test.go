@@ -75,12 +75,10 @@ func TestMicrovmGetBasicAuthToken(t *testing.T) {
 	token := "foo"
 
 	mvm := newMicrovmWithSpec(mvmName, infrav1.MicrovmSpec{
-		Host: infrav1.HostSpec{
-			Host: microvm.Host{
-				Endpoint: hostName,
-			},
-			BasicAuthSecret: secretName,
+		Host: microvm.Host{
+			Endpoint: hostName,
 		},
+		BasicAuthSecret: secretName,
 	})
 	otherMvm := newMicrovm(mvmName, "")
 	secret := newSecret(secretName, map[string][]byte{"token": []byte(token)})
@@ -290,10 +288,8 @@ func newMicrovm(name string, providerID string) *infrav1.Microvm {
 			Namespace: "default",
 		},
 		Spec: infrav1.MicrovmSpec{
-			Host: infrav1.HostSpec{
-				Host: microvm.Host{
-					Endpoint: "fd1",
-				},
+			Host: microvm.Host{
+				Endpoint: "fd1",
 			},
 		},
 	}

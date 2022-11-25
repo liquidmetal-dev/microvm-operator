@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	microvm "github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 )
@@ -27,6 +28,9 @@ type MicrovmReplicaSetSpec struct {
 	// Microvm spec
 	// +kubebuilder:default=1
 	Replicas *int32 `json:"replicas,omitempty"`
+	// Host sets the host device address for Microvm creation.
+	// +kubebuilder:validation:Required
+	microvm.Host `json:",inline"`
 	// // Selector is a label query over microvms that should match the replica count.
 	// // Label keys and values that must match in order to be controlled by this replica set.
 	// // It must match the microvm template's labels.

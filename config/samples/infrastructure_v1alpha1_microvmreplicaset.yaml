@@ -9,4 +9,28 @@ metadata:
     app.kubernetes.io/created-by: microvm-operator
   name: microvmreplicaset-sample
 spec:
-  # TODO(user): Add fields here
+  replicas: 2
+  host:
+    name: host1
+    endpoint: 1.2.3.4:9090
+  template:
+    spec:
+      sshPublicKeys:
+      - user: "root"
+        authorizedKeys:
+        - "ssh-ed25519 foobar"
+      userdata: |
+        #!/bin/bash
+        echo "hi from my microvm!"
+      kernel:
+        filename: boot/vmlinux
+        image: ghcr.io/weaveworks-liquidmetal/flintlock-kernel:5.10.77
+      kernelCmdline: {}
+      memoryMb: 2048
+      vcpu: 2
+      networkInterfaces:
+      - guestDeviceName: eth1
+        type: macvtap
+      rootVolume:
+        id: root
+        image: ghcr.io/weaveworks-liquidmetal/capmvm-kubernetes:1.21.8
