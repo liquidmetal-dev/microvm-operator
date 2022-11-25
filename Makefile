@@ -151,7 +151,7 @@ $(CONTROLLER_GEN): $(LOCALBIN)
 .PHONY: counterfeiter
 counterfeiter: $(COUNTERFEITER)
 $(COUNTERFEITER): $(LOCALBIN)
-	test -s $(LOCALBIN)/counterfeiter || GOBIN=$(LOCALBIN) go install github.com/maxbrunsfeld/counterfeiter/v6
+	cd $(LOCALBIN); go build -o $(subst bin/,,$@) github.com/maxbrunsfeld/counterfeiter/v6
 
 .PHONY: envtest
 envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
