@@ -63,7 +63,7 @@ func (r *MicrovmReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			return ctrl.Result{}, nil
 		}
 
-		log.Error(err, "error getting microvmmachine", "id", req.NamespacedName)
+		log.Error(err, "error getting microvm", "id", req.NamespacedName)
 
 		return ctrl.Result{}, fmt.Errorf("unable to reconcile: %w", err)
 	}
@@ -123,11 +123,11 @@ func (r *MicrovmReconciler) reconcileDelete(
 		// Mark the machine as no longer ready before we delete.
 		mvmScope.SetNotReady(infrav1.MicrovmDeletingReason, "Info", "")
 
-		if err := mvmScope.Patch(); err != nil {
-			mvmScope.Error(err, "failed to patch object")
-
-			return ctrl.Result{}, err
-		}
+		defer func() {
+			if err := mvmScope.Patch(); err != nil {
+				mvmScope.Error(err, "failed to patch object")
+			}
+		}()
 
 		if microvm.Status.State != flintlocktypes.MicroVMStatus_DELETING {
 			if _, err := mvmSvc.Delete(ctx); err != nil {
@@ -269,7 +269,7 @@ func (r *MicrovmReconciler) parseMicroVMState(
 		mvmScope.V(2).Info("microvm is deleting")
 
 		return ctrl.Result{RequeueAfter: requeuePeriod}, nil
-		// NO IDEA WHAT IS GOING ON WITH THIS MVM
+	// NO IDEA WHAT IS GOING ON WITH THIS MVM
 	default:
 		mvmScope.MicroVM.Status.VMState = &microvm.VMStateUnknown
 		mvmScope.SetNotReady(
