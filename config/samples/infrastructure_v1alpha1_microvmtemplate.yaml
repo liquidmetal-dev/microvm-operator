@@ -1,0 +1,12 @@
+apiVersion: infrastructure.flintlock.x-k8s.io/v1alpha1
+kind: MicrovmTemplate
+metadata:
+  labels:
+    app.kubernetes.io/name: microvmtemplate
+    app.kubernetes.io/instance: microvmtemplate-sample
+    app.kubernetes.io/part-of: microvm-operator
+    app.kuberentes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: microvm-operator
+  name: microvmtemplate-sample
+spec:
+  # TODO(user): Add fields here

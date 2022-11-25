@@ -22,4 +22,12 @@ resources:
   kind: MicrovmReplicaSet
   path: github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1
   version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: flintlock.x-k8s.io
+  group: infrastructure
+  kind: MicrovmTemplate
+  path: github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1
+  version: v1alpha1
 version: "3"

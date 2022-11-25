@@ -8,6 +8,32 @@ rules:
 - apiGroups:
   - infrastructure.flintlock.x-k8s.io
   resources:
+  - microvmreplicasets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - infrastructure.flintlock.x-k8s.io
+  resources:
+  - microvmreplicasets/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - infrastructure.flintlock.x-k8s.io
+  resources:
+  - microvmreplicasets/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - infrastructure.flintlock.x-k8s.io
+  resources:
   - microvms
   verbs:
   - create
