@@ -5,9 +5,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.9.2
   creationTimestamp: null
-  name: microvmreplicasets.infrastructure.flintlock.x-k8s.io
+  name: microvmreplicasets.infrastructure.liquid-metal.io
 spec:
-  group: infrastructure.flintlock.x-k8s.io
+  group: infrastructure.liquid-metal.io
   names:
     kind: MicrovmReplicaSet
     listKind: MicrovmReplicaSetList

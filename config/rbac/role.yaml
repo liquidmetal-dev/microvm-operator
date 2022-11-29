@@ -6,7 +6,7 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
-  - infrastructure.flintlock.x-k8s.io
+  - infrastructure.liquid-metal.io
   resources:
   - microvmreplicasets
   verbs:
@@ -18,13 +18,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - infrastructure.flintlock.x-k8s.io
+  - infrastructure.liquid-metal.io
   resources:
   - microvmreplicasets/finalizers
   verbs:
   - update
 - apiGroups:
-  - infrastructure.flintlock.x-k8s.io
+  - infrastructure.liquid-metal.io
   resources:
   - microvmreplicasets/status
   verbs:
@@ -32,7 +32,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - infrastructure.flintlock.x-k8s.io
+  - infrastructure.liquid-metal.io
   resources:
   - microvms
   verbs:
@@ -44,13 +44,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - infrastructure.flintlock.x-k8s.io
+  - infrastructure.liquid-metal.io
   resources:
   - microvms/finalizers
   verbs:
   - update
 - apiGroups:
-  - infrastructure.flintlock.x-k8s.io
+  - infrastructure.liquid-metal.io
   resources:
   - microvms/status
   verbs:

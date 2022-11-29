@@ -4,4 +4,4 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     cert-manager.io/inject-ca-from: $(CERTIFICATE_NAMESPACE)/$(CERTIFICATE_NAME)
-  name: microvms.infrastructure.flintlock.x-k8s.io
+  name: microvms.infrastructure.liquid-metal.io

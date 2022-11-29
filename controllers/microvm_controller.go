@@ -50,9 +50,9 @@ type MicrovmReconciler struct {
 	MvmClientFunc flclient.FactoryFunc
 }
 
-//+kubebuilder:rbac:groups=infrastructure.flintlock.x-k8s.io,resources=microvms,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=infrastructure.flintlock.x-k8s.io,resources=microvms/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=infrastructure.flintlock.x-k8s.io,resources=microvms/finalizers,verbs=update
+//+kubebuilder:rbac:groups=infrastructure.liquid-metal.io,resources=microvms,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=infrastructure.liquid-metal.io,resources=microvms/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=infrastructure.liquid-metal.io,resources=microvms/finalizers,verbs=update
 
 func (r *MicrovmReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := log.FromContext(ctx)

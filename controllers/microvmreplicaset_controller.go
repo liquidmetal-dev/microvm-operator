@@ -33,9 +33,9 @@ type MicrovmReplicaSetReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=infrastructure.flintlock.x-k8s.io,resources=microvmreplicasets,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=infrastructure.flintlock.x-k8s.io,resources=microvmreplicasets/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=infrastructure.flintlock.x-k8s.io,resources=microvmreplicasets/finalizers,verbs=update
+//+kubebuilder:rbac:groups=infrastructure.liquid-metal.io,resources=microvmreplicasets,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=infrastructure.liquid-metal.io,resources=microvmreplicasets/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=infrastructure.liquid-metal.io,resources=microvmreplicasets/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.

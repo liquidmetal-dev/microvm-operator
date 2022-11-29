@@ -5,9 +5,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.9.2
   creationTimestamp: null
-  name: microvmtemplates.infrastructure.flintlock.x-k8s.io
+  name: microvmtemplates.infrastructure.liquid-metal.io
 spec:
-  group: infrastructure.flintlock.x-k8s.io
+  group: infrastructure.liquid-metal.io
   names:
     kind: MicrovmTemplate
     listKind: MicrovmTemplateList

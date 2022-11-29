@@ -12,7 +12,7 @@ metadata:
   name: microvmreplicaset-editor-role
 rules:
 - apiGroups:
-  - infrastructure.flintlock.x-k8s.io
+  - infrastructure.liquid-metal.io
   resources:
   - microvmreplicasets
   verbs:
@@ -24,7 +24,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - infrastructure.flintlock.x-k8s.io
+  - infrastructure.liquid-metal.io
   resources:
   - microvmreplicasets/status
   verbs:
