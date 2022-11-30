@@ -50,10 +50,19 @@ spec:
                       metadata: name: mybasicauthsecret namespace: same-as-microvm
                       type: Opaque data: token: YWRtaW4="
                     type: string
-                  endpoint:
-                    description: Endpoint is the API endpoint for the microvm service
-                      (i.e. flintlock) including the port.
-                    type: string
+                  host:
+                    description: Host sets the host device address for Microvm creation.
+                    properties:
+                      endpoint:
+                        description: Endpoint is the API endpoint for the microvm
+                          service (i.e. flintlock) including the port.
+                        type: string
+                      name:
+                        description: Name is an optional name for the host.
+                        type: string
+                    required:
+                    - endpoint
+                    type: object
                   initrd:
                     description: Initrd is an optional initial ramdisk to use.
                     properties:
@@ -112,9 +121,6 @@ spec:
                     required:
                     - endpoint
                     type: object
-                  name:
-                    description: Name is an optional name for the host.
-                    type: string
                   networkInterfaces:
                     description: NetworkInterfaces specifies the network interfaces
                       attached to the microvm.
@@ -246,7 +252,6 @@ spec:
                       type: object
                     type: array
                 required:
-                - endpoint
                 - kernel
                 - memoryMb
                 - networkInterfaces

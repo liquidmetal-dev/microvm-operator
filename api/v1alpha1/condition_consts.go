@@ -24,4 +24,16 @@ const (
 	// MicrovmUnknownStateReason indicates that the microvm in in an unknown or unsupported state
 	// for reconciliation.
 	MicrovmUnknownStateReason = "MicrovmUnknownState"
+
+	// MicrovmReplicaSetReadyCondition indicates that the microvmreplicaset is in a complete state.
+	MicrovmReplicaSetReadyCondition clusterv1.ConditionType = "MicrovmReplicaSetReady"
+
+	// MicrovmReplicaSetIncompleteReason indicates the microvmreplicaset does not have all replicas yet.
+	MicrovmReplicaSetIncompleteReason = "MicrovmReplicaSetIncomplete"
+
+	// MicrovmReplicaSetDeletingReason indicates the microvmreplicaset is in a deleted state.
+	MicrovmReplicaSetDeletingReason = "MicrovmReplicaSetDeleting"
+
+	// MicrovmReplicaSetDeletedFailedReason indicates the microvmreplicaset failed to deleted cleanly.
+	MicrovmReplicaSetDeleteFailedReason = "MicrovmReplicaSetDeleteFailed"
 )

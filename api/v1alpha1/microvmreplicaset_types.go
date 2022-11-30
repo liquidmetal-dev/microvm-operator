@@ -22,6 +22,12 @@ import (
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 )
 
+const (
+	// MvmRSFinalizer allows ReconcileMicrovmReplicaSet to clean up resources associated with the ReplicaSet
+	// before removing it from the apiserver.
+	MvmRSFinalizer = "microvmreplicaset.infrastructure.microvm.x-k8s.io"
+)
+
 // MicrovmReplicaSetSpec defines the desired state of MicrovmReplicaSet
 type MicrovmReplicaSetSpec struct {
 	// Replicas is the number of Microvms to create on the given Host with the given
@@ -30,7 +36,7 @@ type MicrovmReplicaSetSpec struct {
 	Replicas *int32 `json:"replicas,omitempty"`
 	// Host sets the host device address for Microvm creation.
 	// +kubebuilder:validation:Required
-	microvm.Host `json:",inline"`
+	Host microvm.Host `json:"host,omitempty"`
 	// // Selector is a label query over microvms that should match the replica count.
 	// // Label keys and values that must match in order to be controlled by this replica set.
 	// // It must match the microvm template's labels.
@@ -44,11 +50,16 @@ type MicrovmReplicaSetSpec struct {
 
 // MicrovmReplicaSetStatus defines the observed state of MicrovmReplicaSet
 type MicrovmReplicaSetStatus struct {
-	// Replicas is the most recently observed number of replicas.
-	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller
+	// Ready is true when Replicas is Equal to ReadyReplicas.
+	// +optional
+	// +kubebuilder:default=false
+	Ready bool `json:"ready"`
+
+	// Replicas is the most recently observed number of replicas which have been created.
+	// +optional
 	Replicas int32 `json:"replicas"`
 
-	// readyReplicas is the number of pods targeted by this ReplicaSet with a Ready Condition.
+	// ReadyReplicas is the number of pods targeted by this ReplicaSet with a Ready Condition.
 	// +optional
 	ReadyReplicas int32 `json:"readyReplicas,omitempty"`
 
@@ -56,7 +67,7 @@ type MicrovmReplicaSetStatus struct {
 	// +optional
 	// +patchMergeKey=type
 	// +patchStrategy=merge
-	Conditions []clusterv1.Conditions `json:"conditions,omitempty"`
+	Conditions clusterv1.Conditions `json:"conditions,omitempty"`
 }
 
 //+kubebuilder:object:root=true
@@ -82,4 +93,14 @@ type MicrovmReplicaSetList struct {
 
 func init() {
 	SchemeBuilder.Register(&MicrovmReplicaSet{}, &MicrovmReplicaSetList{})
+}
+
+// GetConditions returns the observations of the operational state of the MicrovmMachine resource.
+func (r *MicrovmReplicaSet) GetConditions() clusterv1.Conditions {
+	return r.Status.Conditions
+}
+
+// SetConditions sets the underlying service state of the MicrovmMachine to the predescribed clusterv1.Conditions.
+func (r *MicrovmReplicaSet) SetConditions(conditions clusterv1.Conditions) {
+	r.Status.Conditions = conditions
 }

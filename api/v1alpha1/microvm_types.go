@@ -32,8 +32,8 @@ const (
 // MicrovmSpec defines the desired state of Microvm
 type MicrovmSpec struct {
 	// Host sets the host device address for Microvm creation.
-	// +kubebuilder:validation:Required
-	microvm.Host `json:",inline"`
+	// +optional
+	Host microvm.Host `json:"host,omitempty"`
 	// VMSpec contains the Microvm spec.
 	// +kubebuilder:validation:Required
 	microvm.VMSpec `json:",inline"`
@@ -52,7 +52,7 @@ type MicrovmSpec struct {
 	// 		owner: "root:root"
 	// 		permissions: "0755"
 	// +optional
-	UserData *string `json:"userdata"`
+	UserData *string `json:"userdata,omitempty"`
 	// SSHPublicKeys is list of SSH public keys which will be added to the Microvm.
 	// +optional
 	SSHPublicKeys []microvm.SSHPublicKey `json:"sshPublicKeys,omitempty"`

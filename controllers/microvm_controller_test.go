@@ -27,6 +27,18 @@ func TestMicrovm_Reconcile_MissingObject(t *testing.T) {
 	g.Expect(result.IsZero()).To(BeTrue(), "Expect no requeue to be requested")
 }
 
+func TestMicrovm_Reconcile_MissingHostEndpoint(t *testing.T) {
+	g := NewWithT(t)
+
+	mvm := createMicrovm()
+	mvm.Spec.Host = microvm.Host{}
+
+	client := createFakeClient(g, asRuntimeObject(mvm))
+	result, err := reconcileMicrovm(client, nil)
+	g.Expect(err).NotTo(HaveOccurred(), "Reconciling when microvm does not have an endpoint set should not error")
+	g.Expect(result.IsZero()).To(BeTrue(), "Expect no requeue to be requested")
+}
+
 func TestMicrovm_ReconcileNormal_ServiceGetError(t *testing.T) {
 	g := NewWithT(t)
 

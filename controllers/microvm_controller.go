@@ -68,6 +68,12 @@ func (r *MicrovmReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, fmt.Errorf("unable to reconcile: %w", err)
 	}
 
+	if isNotSet(mvm.Spec.Host.Endpoint) {
+		log.Info("host endpoint not set for microvm, skipping", "id", req.NamespacedName)
+
+		return ctrl.Result{}, nil
+	}
+
 	mvmScope, err := scope.NewMicrovmScope(scope.MicrovmScopeParams{
 		MicroVM: mvm,
 		Client:  r.Client,
@@ -280,6 +286,10 @@ func (r *MicrovmReconciler) parseMicroVMState(
 
 		return ctrl.Result{RequeueAfter: requeuePeriod}, errMicrovmUnknownState
 	}
+}
+
+func isNotSet(value string) bool {
+	return value == ""
 }
 
 // SetupWithManager sets up the controller with the Manager.
