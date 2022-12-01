@@ -346,13 +346,13 @@ spec:
                 description: Ready is true when Replicas is Equal to ReadyReplicas.
                 type: boolean
               readyReplicas:
-                description: readyReplicas is the number of pods targeted by this
+                description: ReadyReplicas is the number of pods targeted by this
                   ReplicaSet with a Ready Condition.
                 format: int32
                 type: integer
               replicas:
-                description: 'Replicas is the most recently observed number of replicas.
-                  More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller'
+                description: Replicas is the most recently observed number of replicas
+                  which have been created.
                 format: int32
                 type: integer
             type: object

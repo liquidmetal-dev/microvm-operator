@@ -31,9 +31,15 @@ const (
 	// MicrovmReplicaSetIncompleteReason indicates the microvmreplicaset does not have all replicas yet.
 	MicrovmReplicaSetIncompleteReason = "MicrovmReplicaSetIncomplete"
 
+	// MicrovmReplicaSetProvisionFailedReason indicates that the microvm failed to provision.
+	MicrovmReplicaSetProvisionFailedReason = "MicrovmReplicaSetProvisionFailed"
+
 	// MicrovmReplicaSetDeletingReason indicates the microvmreplicaset is in a deleted state.
 	MicrovmReplicaSetDeletingReason = "MicrovmReplicaSetDeleting"
 
 	// MicrovmReplicaSetDeletedFailedReason indicates the microvmreplicaset failed to deleted cleanly.
 	MicrovmReplicaSetDeleteFailedReason = "MicrovmReplicaSetDeleteFailed"
+
+	// MicrovmReplicaSetUpdatingReason indicates the microvm is in a pending state.
+	MicrovmReplicaSetUpdatingReason = "MicrovmReplicaSetUpdating"
 )

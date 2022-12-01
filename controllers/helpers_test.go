@@ -34,10 +34,11 @@ import (
 )
 
 const (
-	testNamespace     = "ns1"
-	testMicrovmName   = "mvm1"
-	testMicrovmUID    = "ABCDEF123456"
-	testBootstrapData = "somesamplebootstrapsdata"
+	testNamespace             = "ns1"
+	testMicrovmName           = "mvm1"
+	testMicrovmReplicaSetName = "rs1"
+	testMicrovmUID            = "ABCDEF123456"
+	testBootstrapData         = "somesamplebootstrapsdata"
 )
 
 func asRuntimeObject(microvm *infrav1.Microvm) []runtime.Object {
@@ -68,6 +69,34 @@ func reconcileMicrovm(client client.Client, mockAPIClient flclient.Client) (ctrl
 	return mvmController.Reconcile(context.TODO(), request)
 }
 
+func reconcileMicrovmReplicaSet(client client.Client) (ctrl.Result, error) {
+	mvmRSController := &controllers.MicrovmReplicaSetReconciler{
+		Client: client,
+		Scheme: client.Scheme(),
+	}
+
+	request := ctrl.Request{
+		NamespacedName: types.NamespacedName{
+			Name:      testMicrovmReplicaSetName,
+			Namespace: testNamespace,
+		},
+	}
+
+	return mvmRSController.Reconcile(context.TODO(), request)
+}
+
+func reconcileMicrovmReplicaSetNTimes(g *WithT, client client.Client, count int32) error {
+	for count > 0 {
+		ensureMicrovmState(g, client)
+		if _, err := reconcileMicrovmReplicaSet(client); err != nil {
+			return err
+		}
+		count--
+	}
+
+	return nil
+}
+
 func getMicrovm(c client.Client, name, namespace string) (*infrav1.Microvm, error) {
 	key := client.ObjectKey{
 		Name:      name,
@@ -77,6 +106,23 @@ func getMicrovm(c client.Client, name, namespace string) (*infrav1.Microvm, erro
 	mvm := &infrav1.Microvm{}
 	err := c.Get(context.TODO(), key, mvm)
 	return mvm, err
+}
+
+func listMicrovm(c client.Client) (*infrav1.MicrovmList, error) {
+	mvm := &infrav1.MicrovmList{}
+	err := c.List(context.TODO(), mvm)
+	return mvm, err
+}
+
+func getMicrovmReplicaSet(c client.Client, name, namespace string) (*infrav1.MicrovmReplicaSet, error) {
+	key := client.ObjectKey{
+		Name:      name,
+		Namespace: namespace,
+	}
+
+	mvmRS := &infrav1.MicrovmReplicaSet{}
+	err := c.Get(context.TODO(), key, mvmRS)
+	return mvmRS, err
 }
 
 func createFakeClient(g *WithT, objects []runtime.Object) client.Client {
@@ -122,6 +168,27 @@ func createMicrovm() *infrav1.Microvm {
 						Address:         "",
 					},
 				},
+			},
+		},
+	}
+}
+
+func createMicrovmReplicaSet(reps int32) *infrav1.MicrovmReplicaSet {
+	mvm := createMicrovm()
+	mvm.Spec.Host = microvm.Host{}
+
+	return &infrav1.MicrovmReplicaSet{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      testMicrovmReplicaSetName,
+			Namespace: testNamespace,
+		},
+		Spec: infrav1.MicrovmReplicaSetSpec{
+			Host: microvm.Host{
+				Endpoint: "127.0.0.1:9090",
+			},
+			Replicas: pointer.Int32(reps),
+			Template: infrav1.MicrovmTemplateSpec{
+				Spec: mvm.Spec,
 			},
 		},
 	}
@@ -185,18 +252,40 @@ func assertMicrovmReconciled(g *WithT, reconciled *infrav1.Microvm) {
 	g.Expect(reconciled.Status.Ready).To(BeTrue(), "The Ready property must be true when the mvm has been reconciled")
 }
 
-func assertFinalizer(g *WithT, reconciled *infrav1.Microvm) {
-	g.Expect(reconciled.ObjectMeta.Finalizers).NotTo(BeEmpty(), "Expected at least one finalizer to be set")
-	g.Expect(hasMicrovmFinalizer(reconciled)).To(BeTrue(), "Expect the mvm finalizer")
+func microvmsCreated(g *WithT, c client.Client) int32 {
+	mvmList, err := listMicrovm(c)
+	g.Expect(err).NotTo(HaveOccurred())
+	return int32(len(mvmList.Items))
 }
 
-func hasMicrovmFinalizer(mvm *infrav1.Microvm) bool {
-	if len(mvm.ObjectMeta.Finalizers) == 0 {
+func ensureMicrovmState(g *WithT, c client.Client) {
+	// update the microvms so they report as ready to move the replicaset reconciliation along
+	mvmList, err := listMicrovm(c)
+	g.Expect(err).NotTo(HaveOccurred())
+
+	for _, mvm := range mvmList.Items {
+		mvm.Status.Ready = true
+		g.Expect(c.Update(context.TODO(), &mvm)).To(Succeed())
+	}
+}
+
+func assertFinalizer(g *WithT, reconciled *infrav1.Microvm) {
+	g.Expect(reconciled.ObjectMeta.Finalizers).NotTo(BeEmpty(), "Expected at least one finalizer to be set")
+	g.Expect(hasMicrovmFinalizer(&reconciled.ObjectMeta, infrav1.MvmFinalizer)).To(BeTrue(), "Expect the mvm finalizer")
+}
+
+func assertMRSFinalizer(g *WithT, reconciled *infrav1.MicrovmReplicaSet) {
+	g.Expect(reconciled.ObjectMeta.Finalizers).NotTo(BeEmpty(), "Expected at least one finalizer to be set")
+	g.Expect(hasMicrovmFinalizer(&reconciled.ObjectMeta, infrav1.MvmRSFinalizer)).To(BeTrue(), "Expect the mvmrs finalizer")
+}
+
+func hasMicrovmFinalizer(meta *metav1.ObjectMeta, finalizer string) bool {
+	if len(meta.Finalizers) == 0 {
 		return false
 	}
 
-	for _, f := range mvm.ObjectMeta.Finalizers {
-		if f == infrav1.MvmFinalizer {
+	for _, f := range meta.Finalizers {
+		if f == finalizer {
 			return true
 		}
 	}

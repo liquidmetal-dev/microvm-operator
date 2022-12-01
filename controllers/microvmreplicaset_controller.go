@@ -123,15 +123,17 @@ func (r *MicrovmReplicaSetReconciler) reconcileDelete(
 
 	for _, mvm := range mvmList {
 		// if the object is already being deleted, skip this
-		if mvm.DeletionTimestamp == nil {
-			// otherwise send a delete call
-			if err := r.Delete(ctx, &mvm); err != nil {
-				mvmReplicaSetScope.Error(err, "failed deleting microvm")
-				mvmReplicaSetScope.SetNotReady(infrav1.MicrovmReplicaSetDeleteFailedReason, "Error", "")
-
-				return ctrl.Result{}, err
-			}
+		if !mvm.DeletionTimestamp.IsZero() {
+			continue
 		}
+
+		// otherwise send a delete call
+		go func(m infrav1.Microvm) {
+			if err := r.Delete(ctx, &m); err != nil {
+				mvmReplicaSetScope.Error(err, "failed deleting microvm", "microvm", m.Name)
+				mvmReplicaSetScope.SetNotReady(infrav1.MicrovmReplicaSetDeleteFailedReason, "Error", "")
+			}
+		}(mvm)
 	}
 
 	// reset the number of created replicas.
@@ -184,13 +186,6 @@ func (r *MicrovmReplicaSetReconciler) reconcileNormal(
 		mvmReplicaSetScope.SetReady()
 
 		return reconcile.Result{}, nil
-	// if all desired microvms have been created, but are not quite ready yet,
-	// set the condition and requeue
-	case mvmReplicaSetScope.CreatedReplicas() == mvmReplicaSetScope.DesiredReplicas():
-		mvmReplicaSetScope.Info("MicrovmReplicaSet creating: waiting for microvms to become ready")
-		mvmReplicaSetScope.SetNotReady(infrav1.MicrovmReplicaSetIncompleteReason, "Info", "")
-
-		return ctrl.Result{RequeueAfter: requeuePeriod}, nil
 	// if we are in this branch then not all desired microvms have been created.
 	// create a new one and set the ownerref to this controller.
 	case mvmReplicaSetScope.CreatedReplicas() < mvmReplicaSetScope.DesiredReplicas():
@@ -198,27 +193,36 @@ func (r *MicrovmReplicaSetReconciler) reconcileNormal(
 
 		if err := r.createMicrovm(ctx, mvmReplicaSetScope); err != nil {
 			mvmReplicaSetScope.Error(err, "failed creating owned microvm")
+			mvmReplicaSetScope.SetNotReady(infrav1.MicrovmReplicaSetProvisionFailedReason, "Error", "")
+
 			return reconcile.Result{}, fmt.Errorf("failed to create new microvm for replicaset: %w", err)
 		}
 
 		mvmReplicaSetScope.SetNotReady(infrav1.MicrovmReplicaSetIncompleteReason, "Info", "")
 	// if we are here then a scale down has been requested.
 	// we delete the first found until the numbers balance out.
-	// TODO this is not ideal, find a better way
+	// TODO the way this works is very naive and often ends up deleting everything
+	// if the timing is wrong/right, find a better way https://github.com/weaveworks-liquidmetal/microvm-operator/issues/17
 	case mvmReplicaSetScope.CreatedReplicas() > mvmReplicaSetScope.DesiredReplicas():
-		mvmReplicaSetScope.Info("MicrovmReplicaSet deleting: delete microvm")
+		mvmReplicaSetScope.Info("MicrovmReplicaSet updating: delete microvm")
+		mvmReplicaSetScope.SetNotReady(infrav1.MicrovmReplicaSetUpdatingReason, "Info", "")
 
 		mvm := mvmList[0]
-		if mvm.DeletionTimestamp == nil {
-			if err := r.Delete(ctx, &mvm); err != nil {
-				mvmReplicaSetScope.Error(err, "failed deleting microvm")
-				mvmReplicaSetScope.SetNotReady(infrav1.MicrovmReplicaSetDeleteFailedReason, "Error", "")
-
-				return ctrl.Result{}, err
-			}
+		if !mvm.DeletionTimestamp.IsZero() {
+			return ctrl.Result{}, nil
 		}
 
-		mvmReplicaSetScope.SetNotReady(infrav1.MicrovmReplicaSetUpdatingReason, "Info", "")
+		if err := r.Delete(ctx, &mvm); err != nil {
+			mvmReplicaSetScope.Error(err, "failed deleting microvm")
+			mvmReplicaSetScope.SetNotReady(infrav1.MicrovmReplicaSetDeleteFailedReason, "Error", "")
+
+			return ctrl.Result{}, err
+		}
+	// if all desired microvms have been created, but are not quite ready yet,
+	// set the condition and requeue
+	default:
+		mvmReplicaSetScope.Info("MicrovmReplicaSet creating: waiting for microvms to become ready")
+		mvmReplicaSetScope.SetNotReady(infrav1.MicrovmReplicaSetIncompleteReason, "Info", "")
 	}
 
 	controllerutil.AddFinalizer(mvmReplicaSetScope.MicrovmReplicaSet, infrav1.MvmRSFinalizer)
