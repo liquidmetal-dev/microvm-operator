@@ -22,21 +22,15 @@ import (
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 )
 
-const (
-	// MvmRSFinalizer allows ReconcileMicrovmReplicaSet to clean up resources associated with the ReplicaSet
-	// before removing it from the apiserver.
-	MvmRSFinalizer = "microvmreplicaset.infrastructure.microvm.x-k8s.io"
-)
-
-// MicrovmReplicaSetSpec defines the desired state of MicrovmReplicaSet
-type MicrovmReplicaSetSpec struct {
+// MicrovmDeploymentSpec defines the desired state of MicrovmDeployment
+type MicrovmDeploymentSpec struct {
 	// Replicas is the number of Microvms to create on the given Host with the given
 	// Microvm spec
 	// +kubebuilder:default=1
 	Replicas *int32 `json:"replicas,omitempty"`
 	// Host sets the host device address for Microvm creation.
 	// +kubebuilder:validation:Required
-	Host microvm.Host `json:"host,omitempty"`
+	Hosts []microvm.Host `json:"hosts,omitempty"`
 	// Template is the object that describes the Microvm that will be created if
 	// insufficient replicas are detected.
 	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template
@@ -44,9 +38,9 @@ type MicrovmReplicaSetSpec struct {
 	Template MicrovmTemplateSpec `json:"template,omitempty" protobuf:"bytes,3,opt,name=template"`
 }
 
-// MicrovmReplicaSetStatus defines the observed state of MicrovmReplicaSet
-type MicrovmReplicaSetStatus struct {
-	// Ready is true when Replicas is Equal to ReadyReplicas.
+// MicrovmDeploymentStatus defines the observed state of MicrovmDeployment
+type MicrovmDeploymentStatus struct {
+	// Ready is true when all Replicas report ready
 	// +optional
 	// +kubebuilder:default=false
 	Ready bool `json:"ready"`
@@ -59,7 +53,7 @@ type MicrovmReplicaSetStatus struct {
 	// +optional
 	ReadyReplicas int32 `json:"readyReplicas,omitempty"`
 
-	// Represents the latest available observations of a replica set's current state.
+	// Represents the latest available observations of a deployments's current state.
 	// +optional
 	// +patchMergeKey=type
 	// +patchStrategy=merge
@@ -69,34 +63,34 @@ type MicrovmReplicaSetStatus struct {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
-// MicrovmReplicaSet is the Schema for the microvmreplicasets API
-type MicrovmReplicaSet struct {
+// MicrovmDeployment is the Schema for the microvmdeployments API
+type MicrovmDeployment struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   MicrovmReplicaSetSpec   `json:"spec,omitempty"`
-	Status MicrovmReplicaSetStatus `json:"status,omitempty"`
+	Spec   MicrovmDeploymentSpec   `json:"spec,omitempty"`
+	Status MicrovmDeploymentStatus `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 
-// MicrovmReplicaSetList contains a list of MicrovmReplicaSet
-type MicrovmReplicaSetList struct {
+// MicrovmDeploymentList contains a list of MicrovmDeployment
+type MicrovmDeploymentList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []MicrovmReplicaSet `json:"items"`
+	Items           []MicrovmDeployment `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&MicrovmReplicaSet{}, &MicrovmReplicaSetList{})
+	SchemeBuilder.Register(&MicrovmDeployment{}, &MicrovmDeploymentList{})
 }
 
 // GetConditions returns the observations of the operational state of the MicrovmMachine resource.
-func (r *MicrovmReplicaSet) GetConditions() clusterv1.Conditions {
+func (r *MicrovmDeployment) GetConditions() clusterv1.Conditions {
 	return r.Status.Conditions
 }
 
 // SetConditions sets the underlying service state of the MicrovmMachine to the predescribed clusterv1.Conditions.
-func (r *MicrovmReplicaSet) SetConditions(conditions clusterv1.Conditions) {
+func (r *MicrovmDeployment) SetConditions(conditions clusterv1.Conditions) {
 	r.Status.Conditions = conditions
 }

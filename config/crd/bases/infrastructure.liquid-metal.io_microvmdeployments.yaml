@@ -5,20 +5,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.9.2
   creationTimestamp: null
-  name: microvmreplicasets.infrastructure.liquid-metal.io
+  name: microvmdeployments.infrastructure.liquid-metal.io
 spec:
   group: infrastructure.liquid-metal.io
   names:
-    kind: MicrovmReplicaSet
-    listKind: MicrovmReplicaSetList
-    plural: microvmreplicasets
-    singular: microvmreplicaset
+    kind: MicrovmDeployment
+    listKind: MicrovmDeploymentList
+    plural: microvmdeployments
+    singular: microvmdeployment
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: MicrovmReplicaSet is the Schema for the microvmreplicasets API
+        description: MicrovmDeployment is the Schema for the microvmdeployments API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -33,21 +33,23 @@ spec:
           metadata:
             type: object
           spec:
-            description: MicrovmReplicaSetSpec defines the desired state of MicrovmReplicaSet
+            description: MicrovmDeploymentSpec defines the desired state of MicrovmDeployment
             properties:
-              host:
+              hosts:
                 description: Host sets the host device address for Microvm creation.
-                properties:
-                  endpoint:
-                    description: Endpoint is the API endpoint for the microvm service
-                      (i.e. flintlock) including the port.
-                    type: string
-                  name:
-                    description: Name is an optional name for the host.
-                    type: string
-                required:
-                - endpoint
-                type: object
+                items:
+                  properties:
+                    endpoint:
+                      description: Endpoint is the API endpoint for the microvm service
+                        (i.e. flintlock) including the port.
+                      type: string
+                    name:
+                      description: Name is an optional name for the host.
+                      type: string
+                  required:
+                  - endpoint
+                  type: object
+                type: array
               replicas:
                 default: 1
                 description: Replicas is the number of Microvms to create on the given
@@ -289,11 +291,11 @@ spec:
                 type: object
             type: object
           status:
-            description: MicrovmReplicaSetStatus defines the observed state of MicrovmReplicaSet
+            description: MicrovmDeploymentStatus defines the observed state of MicrovmDeployment
             properties:
               conditions:
-                description: Represents the latest available observations of a replica
-                  set's current state.
+                description: Represents the latest available observations of a deployments's
+                  current state.
                 items:
                   description: Condition defines an observation of a Cluster API resource
                     operational state.
@@ -339,7 +341,7 @@ spec:
                 type: array
               ready:
                 default: false
-                description: Ready is true when Replicas is Equal to ReadyReplicas.
+                description: Ready is true when all Replicas report ready
                 type: boolean
               readyReplicas:
                 description: ReadyReplicas is the number of pods targeted by this

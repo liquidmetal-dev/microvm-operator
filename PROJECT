@@ -1,4 +1,4 @@
-domain: flintlock.x-k8s.io
+domain: liquid-metal.io
 layout:
 - go.kubebuilder.io/v3
 projectName: microvm-operator
@@ -8,7 +8,7 @@ resources:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: flintlock.x-k8s.io
+  domain: liquid-metal.io
   group: infrastructure
   kind: Microvm
   path: github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1
@@ -17,7 +17,7 @@ resources:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: flintlock.x-k8s.io
+  domain: liquid-metal.io
   group: infrastructure
   kind: MicrovmReplicaSet
   path: github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1
@@ -25,9 +25,18 @@ resources:
 - api:
     crdVersion: v1
     namespaced: true
-  domain: flintlock.x-k8s.io
+  domain: liquid-metal.io
   group: infrastructure
   kind: MicrovmTemplate
+  path: github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: liquid-metal.io
+  group: infrastructure
+  kind: MicrovmDeployment
   path: github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1
   version: v1alpha1
 version: "3"

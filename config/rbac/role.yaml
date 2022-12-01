@@ -8,6 +8,32 @@ rules:
 - apiGroups:
   - infrastructure.liquid-metal.io
   resources:
+  - microvmdeployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - infrastructure.liquid-metal.io
+  resources:
+  - microvmdeployments/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - infrastructure.liquid-metal.io
+  resources:
+  - microvmdeployments/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - infrastructure.liquid-metal.io
+  resources:
   - microvmreplicasets
   verbs:
   - create

@@ -1,0 +1,36 @@
+apiVersion: infrastructure.liquid-metal.io/v1alpha1
+kind: MicrovmDeployment
+metadata:
+  labels:
+    app.kubernetes.io/name: microvmdeployment
+    app.kubernetes.io/instance: microvmdeployment-sample
+    app.kubernetes.io/part-of: microvm-operator
+    app.kuberentes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: microvm-operator
+  name: microvmdeployment-sample
+spec:
+  replicas: 2
+  hosts:
+  - name: host1
+    endpoint: 1.2.3.4:9090
+  template:
+    spec:
+      sshPublicKeys:
+      - user: "root"
+        authorizedKeys:
+        - "ssh-ed25519 foobar"
+      userdata: |
+        #!/bin/bash
+        echo "hi from my microvm!"
+      kernel:
+        filename: boot/vmlinux
+        image: ghcr.io/weaveworks-liquidmetal/flintlock-kernel:5.10.77
+      kernelCmdline: {}
+      memoryMb: 2048
+      vcpu: 2
+      networkInterfaces:
+      - guestDeviceName: eth1
+        type: macvtap
+      rootVolume:
+        id: root
+        image: ghcr.io/weaveworks-liquidmetal/capmvm-kubernetes:1.21.8
