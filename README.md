@@ -3,6 +3,8 @@
 A simple kubernetes operator to create batches of MicroVMs on Flintlock-running
 devices.
 
+**Note that this is VERY poc right now...**
+
 ## Getting Started
 
 For now refer to the auto-generated [kubebuilder docs](/docs/kubebuilder.md).
