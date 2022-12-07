@@ -57,4 +57,10 @@ const (
 
 	// MicrovmDeploymentUpdateFailed indicates the microvm deployment is in a pending state.
 	MicrovmDeploymentUpdateFailedReason = "MicrovmDeploymentUpdateFailed"
+
+	// MicrovmDeploymentDeletingReason indicates the microvmreplicaset is in a deleted state.
+	MicrovmDeploymentDeletingReason = "MicrovmDeploymentDeleting"
+
+	// MicrovmDeploymentDeleteFailedReason indicates the microvmreplicaset failed to deleted cleanly.
+	MicrovmDeploymentDeleteFailedReason = "MicrovmDeploymentDeleteFailed"
 )

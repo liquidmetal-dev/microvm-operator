@@ -93,7 +93,60 @@ func (r *MicrovmDeploymentReconciler) reconcileDelete(
 	ctx context.Context,
 	mvmDeploymentScope *scope.MicrovmDeploymentScope,
 ) (reconcile.Result, error) {
-	return ctrl.Result{}, nil
+	mvmDeploymentScope.Info("Reconciling MicrovmReplicaSet delete")
+
+	// get all owned microvmreplicasets
+	rsList, err := r.getOwnedReplicaSets(ctx, mvmDeploymentScope)
+	if err != nil {
+		mvmDeploymentScope.Error(err, "failed getting owned microvms")
+		return ctrl.Result{}, fmt.Errorf("failed to list microvms: %w", err)
+	}
+
+	// if there are no owned sets left we are done, we can leave now
+	if len(rsList) == 0 {
+		controllerutil.RemoveFinalizer(mvmDeploymentScope.MicrovmDeployment, infrav1.MvmDeploymentFinalizer)
+		mvmDeploymentScope.Info("microvmreplicaset deleted", "name", mvmDeploymentScope.Name())
+
+		return ctrl.Result{}, nil
+	}
+
+	// there are still some resources to clear
+	//
+	// set the object to not ready before we remove anything
+	mvmDeploymentScope.SetNotReady(infrav1.MicrovmDeploymentDeletingReason, "Info", "")
+	// just to be complete, mark all replicas as not ready too
+	mvmDeploymentScope.SetReadyReplicas(0)
+
+	defer func() {
+		if err := mvmDeploymentScope.Patch(); err != nil {
+			mvmDeploymentScope.Error(err, "failed to patch microvmreplicaset")
+		}
+	}()
+
+	var created int32 = 0
+
+	for _, rs := range rsList {
+		created += rs.Status.Replicas
+
+		// if the object is already being deleted, skip this
+		if !rs.DeletionTimestamp.IsZero() {
+			continue
+		}
+
+		// otherwise send a delete call
+		go func(rs infrav1.MicrovmReplicaSet) {
+			if err := r.Delete(ctx, &rs); err != nil {
+				mvmDeploymentScope.Error(err, "failed deleting microvmreplicaset", "set", rs.Name)
+				mvmDeploymentScope.SetNotReady(infrav1.MicrovmDeploymentDeleteFailedReason, "Error", "")
+			}
+		}(rs)
+	}
+
+	// reset the number of still existing replicas, just so we know what is still there.
+	// we'll come back around to ensure they are really gone.
+	mvmDeploymentScope.SetCreatedReplicas(created)
+
+	return ctrl.Result{RequeueAfter: requeuePeriod}, nil
 }
 
 func (r *MicrovmDeploymentReconciler) reconcileNormal(

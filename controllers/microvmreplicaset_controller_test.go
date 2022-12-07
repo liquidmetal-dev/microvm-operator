@@ -170,7 +170,7 @@ func TestMicrovmRS_ReconcileDelete_DeleteSucceeds(t *testing.T) {
 
 	// second reconciliation
 	result, err = reconcileMicrovmReplicaSet(client)
-	g.Expect(err).NotTo(HaveOccurred(), "Reconciling microvmreplicaset the third time should not error")
+	g.Expect(err).NotTo(HaveOccurred(), "Reconciling microvmreplicaset the second time should not error")
 	g.Expect(result.IsZero()).To(BeFalse(), "Expect requeue to be requested after reconcile")
 
 	reconciled, err = getMicrovmReplicaSet(client, testMicrovmReplicaSetName, testNamespace)
@@ -188,5 +188,5 @@ func TestMicrovmRS_ReconcileDelete_DeleteSucceeds(t *testing.T) {
 	g.Expect(result.IsZero()).To(BeTrue(), "Expect requeue to not be requested after reconcile")
 
 	reconciled, err = getMicrovmReplicaSet(client, testMicrovmReplicaSetName, testNamespace)
-	g.Expect(err).To(HaveOccurred(), "Getting microvm  not fail")
+	g.Expect(err).To(HaveOccurred(), "Getting microvmreplicaset should fail")
 }
