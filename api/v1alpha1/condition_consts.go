@@ -51,4 +51,10 @@ const (
 
 	// MicrovmDeploymentProvisionFailedReason indicates that the microvm deployment failed to provision.
 	MicrovmDeploymentProvisionFailedReason = "MicrovmDeploymentProvisionFailed"
+
+	// MicrovmDeploymentUpdatingReason indicates the microvm deployment is in a pending state.
+	MicrovmDeploymentUpdatingReason = "MicrovmDeploymentUpdating"
+
+	// MicrovmDeploymentUpdateFailed indicates the microvm deployment is in a pending state.
+	MicrovmDeploymentUpdateFailedReason = "MicrovmDeploymentUpdateFailed"
 )

@@ -114,6 +114,18 @@ func reconcileMicrovmDeployment(client client.Client) (ctrl.Result, error) {
 	return mvmDepController.Reconcile(context.TODO(), request)
 }
 
+func reconcileMicrovmDeploymentNTimes(g *WithT, client client.Client, count int, r, rr int32) error {
+	for count > 0 {
+		ensureMicrovmReplicaSetState(g, client, r, rr)
+		if _, err := reconcileMicrovmDeployment(client); err != nil {
+			return err
+		}
+		count--
+	}
+
+	return nil
+}
+
 func getMicrovm(c client.Client, name, namespace string) (*infrav1.Microvm, error) {
 	key := client.ObjectKey{
 		Name:      name,

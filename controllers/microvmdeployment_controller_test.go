@@ -1,9 +1,11 @@
 package controllers_test
 
 import (
+	"context"
 	"testing"
 
 	. "github.com/onsi/gomega"
+	"github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
 	infrav1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -78,4 +80,65 @@ func TestMicrovmDep_ReconcileNormal_CreateSucceeds(t *testing.T) {
 	g.Expect(reconciled.Status.ReadyReplicas).To(Equal(expectedTotalMicrovms), "Expected all replicas to be ready")
 	g.Expect(microvmReplicaSetsCreated(g, client)).To(Equal(expectedReplicaSets), "Expected all Microvms to have been created after two reconciliations")
 	assertOneSetPerHost(g, reconciled, client)
+}
+
+func TestMicrovmDep_ReconcileNormal_UpdateSucceeds(t *testing.T) {
+	g := NewWithT(t)
+
+	// updating a replicaset with 2 replicas
+	var (
+		initialReplicaSetCount int   = 2
+		scaledReplicaSetCount  int32 = 1
+		expectedReplicas       int32 = 2
+		initialReplicaCount    int32 = 4
+		scaledReplicaCount     int32 = 2
+	)
+
+	mvmD := createMicrovmDeployment(expectedReplicas, initialReplicaSetCount)
+	objects := []runtime.Object{mvmD}
+	client := createFakeClient(g, objects)
+
+	// create
+	g.Expect(reconcileMicrovmDeploymentNTimes(g, client, initialReplicaSetCount+4, expectedReplicas, expectedReplicas)).To(Succeed())
+
+	reconciled, err := getMicrovmDeployment(client, testMicrovmDeploymentName, testNamespace)
+	g.Expect(err).NotTo(HaveOccurred(), "Getting microvm should not fail")
+
+	assertMDFinalizer(g, reconciled)
+	assertConditionTrue(g, reconciled, infrav1.MicrovmDeploymentReadyCondition)
+	g.Expect(reconciled.Status.Ready).To(BeTrue(), "MicrovmDeployment should be ready now")
+	g.Expect(reconciled.Status.Replicas).To(Equal(initialReplicaCount), "Expected the record to contain 4 replicas")
+	g.Expect(reconciled.Status.ReadyReplicas).To(Equal(initialReplicaCount), "Expected all replicas to be ready")
+	g.Expect(microvmReplicaSetsCreated(g, client)).To(Equal(initialReplicaSetCount), "Expected 2 replicasets to exist")
+
+	// update, scale down to 1
+	reconciled.Spec.Hosts = []microvm.Host{{Endpoint: "1.2.3.4:9090"}}
+	g.Expect(client.Update(context.TODO(), reconciled)).To(Succeed())
+
+	// first reconciliation
+	result, err := reconcileMicrovmDeployment(client)
+	g.Expect(err).NotTo(HaveOccurred(), "Reconciling microvmdeployment the first time should not error")
+	g.Expect(result.IsZero()).To(BeFalse(), "Expect requeue to be requested after update")
+
+	reconciled, err = getMicrovmDeployment(client, testMicrovmDeploymentName, testNamespace)
+	g.Expect(err).NotTo(HaveOccurred(), "Getting microvmdeployment should not fail")
+
+	assertConditionFalse(g, reconciled, infrav1.MicrovmDeploymentReadyCondition, infrav1.MicrovmDeploymentUpdatingReason)
+	g.Expect(reconciled.Status.Ready).To(BeFalse(), "MicrovmDeployment should not be ready")
+	g.Expect(reconciled.Status.Replicas).To(Equal(initialReplicaCount), "Expected the record to contain 4 replicas")
+	g.Expect(reconciled.Status.ReadyReplicas).To(Equal(initialReplicaCount), "Expected all replicas to be ready")
+
+	// second reconciliation
+	result, err = reconcileMicrovmDeployment(client)
+	g.Expect(err).NotTo(HaveOccurred(), "Reconciling microvmdeployment the second time should not error")
+	g.Expect(result.IsZero()).To(BeTrue(), "Expect requeue to not be requested after reconcile")
+
+	reconciled, err = getMicrovmDeployment(client, testMicrovmDeploymentName, testNamespace)
+	g.Expect(err).NotTo(HaveOccurred(), "Getting microvmdeployment should not fail")
+
+	assertConditionTrue(g, reconciled, infrav1.MicrovmDeploymentReadyCondition)
+	g.Expect(reconciled.Status.Ready).To(BeTrue(), "MicrovmDeployment should be ready again")
+	g.Expect(reconciled.Status.Replicas).To(Equal(scaledReplicaCount), "Expected the record to contain 2 replicas")
+	g.Expect(reconciled.Status.ReadyReplicas).To(Equal(scaledReplicaCount), "Expected all replicas to be ready")
+	g.Expect(microvmReplicaSetsCreated(g, client)).To(Equal(int(scaledReplicaSetCount)), "Expected replicasets to have been scaled down after two reconciliations")
 }

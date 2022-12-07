@@ -170,6 +170,25 @@ func (r *MicrovmDeploymentReconciler) reconcileNormal(
 		}
 
 		mvmDeploymentScope.SetNotReady(infrav1.MicrovmDeploymentIncompleteReason, "Info", "")
+	// if we are here then a scale down has been requested.
+	// we delete the first found until the numbers balance out.
+	// TODO the way this works is very naive and often ends up deleting everything
+	// if the timing is wrong/right, find a better way https://github.com/weaveworks-liquidmetal/microvm-operator/issues/17
+	case createdSets > mvmDeploymentScope.RequiredSets():
+		mvmDeploymentScope.Info("MicrovmDeployment updating: delete microvmreplicaset")
+		mvmDeploymentScope.SetNotReady(infrav1.MicrovmDeploymentUpdatingReason, "Info", "")
+
+		rs := rsList[0]
+		if !rs.DeletionTimestamp.IsZero() {
+			return ctrl.Result{}, nil
+		}
+
+		if err := r.Delete(ctx, &rs); err != nil {
+			mvmDeploymentScope.Error(err, "failed deleting microvmreplicaset")
+			mvmDeploymentScope.SetNotReady(infrav1.MicrovmDeploymentUpdateFailedReason, "Error", "")
+
+			return ctrl.Result{}, err
+		}
 	// if all desired objects have been created, but are not quite ready yet,
 	// set the condition and requeue
 	default:
