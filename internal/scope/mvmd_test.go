@@ -15,7 +15,6 @@ import (
 )
 
 func TestDetermineHost(t *testing.T) {
-	// RegisterTestingT(t)
 	g := NewWithT(t)
 
 	scheme, err := setupScheme()
@@ -74,6 +73,41 @@ func TestDetermineHost(t *testing.T) {
 			tc.expected(g, fmt.Sprintf("%d", tc.mapCount), host.Endpoint, err)
 		})
 	}
+}
+
+func TestExpiredHosts(t *testing.T) {
+	g := NewWithT(t)
+
+	scheme, err := setupScheme()
+	g.Expect(err).NotTo(HaveOccurred())
+
+	mvmDepName := "md-1"
+
+	mvmDep := newDeployment(mvmDepName, 0)
+	mvmDep.Spec.Hosts = []microvm.Host{
+		{Endpoint: "1"}, {Endpoint: "2"},
+	}
+
+	client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(mvmDep).Build()
+	mvmScope, err := scope.NewMicrovmDeploymentScope(scope.MicrovmDeploymentScopeParams{
+		Client:            client,
+		MicrovmDeployment: mvmDep,
+	})
+	g.Expect(err).NotTo(HaveOccurred())
+
+	hostMap := infrav1.HostMap{
+		"1": struct{}{},
+		"2": struct{}{},
+		"3": struct{}{},
+		"4": struct{}{},
+	}
+
+	hosts := mvmScope.ExpiredHosts(hostMap)
+	g.Expect(len(hosts)).To(Equal(2))
+	g.Expect(hostMap).ToNot(HaveKey("1"))
+	g.Expect(hostMap).ToNot(HaveKey("2"))
+	g.Expect(hostMap).To(HaveKey("3"))
+	g.Expect(hostMap).To(HaveKey("4"))
 }
 
 func newHostMap(hostCount int) infrav1.HostMap {

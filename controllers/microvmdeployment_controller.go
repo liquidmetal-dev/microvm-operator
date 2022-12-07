@@ -178,21 +178,25 @@ func (r *MicrovmDeploymentReconciler) reconcileNormal(
 		ready   int32 = 0
 		created int32 = 0
 
-		hostMap = v1alpha1.HostMap{}
+		activeHosts = v1alpha1.HostMap{}
+		deadHosts   = v1alpha1.HostMap{}
 	)
 
 	for _, rs := range rsList {
 		created += rs.Status.Replicas
 		ready += rs.Status.ReadyReplicas
 
-		hostMap[rs.Spec.Host.Endpoint] = struct{}{}
+		activeHosts[rs.Spec.Host.Endpoint] = struct{}{}
+		deadHosts[rs.Spec.Host.Endpoint] = struct{}{}
 	}
 
 	mvmDeploymentScope.SetCreatedReplicas(created)
 	mvmDeploymentScope.SetReadyReplicas(ready)
 
 	// get a count of the replicasets created
-	createdSets := len(hostMap)
+	createdSets := len(activeHosts)
+	// check whether any hosts have been removed
+	deadHosts = mvmDeploymentScope.ExpiredHosts(deadHosts)
 
 	switch {
 	// if all desired microvms are ready, mark the deployment ready.
@@ -202,12 +206,34 @@ func (r *MicrovmDeploymentReconciler) reconcileNormal(
 		mvmDeploymentScope.SetReady()
 
 		return reconcile.Result{}, nil
+	// if we are here then a host has been removed.
+	// we delete the set associated with that host.
+	case len(deadHosts) > 0:
+		mvmDeploymentScope.Info("MicrovmDeployment updating: delete microvmreplicaset")
+		mvmDeploymentScope.SetNotReady(infrav1.MicrovmDeploymentUpdatingReason, "Info", "")
+
+		for _, rs := range rsList {
+			if _, ok := deadHosts[rs.Spec.Host.Endpoint]; !ok {
+				continue
+			}
+
+			if !rs.DeletionTimestamp.IsZero() {
+				return ctrl.Result{}, nil
+			}
+
+			if err := r.Delete(ctx, &rs); err != nil {
+				mvmDeploymentScope.Error(err, "failed deleting microvmreplicaset")
+				mvmDeploymentScope.SetNotReady(infrav1.MicrovmDeploymentUpdateFailedReason, "Error", "")
+
+				return ctrl.Result{}, err
+			}
+		}
 	// if we are in this branch then not all desired replicasets have been created.
 	// create a new one and set the ownerref to this controller.
 	case createdSets < mvmDeploymentScope.RequiredSets():
 		mvmDeploymentScope.Info("MicrovmDeployment creating: create new microvmreplicaset")
 
-		host, err := mvmDeploymentScope.DetermineHost(hostMap)
+		host, err := mvmDeploymentScope.DetermineHost(activeHosts)
 		if err != nil {
 			mvmDeploymentScope.Error(err, "failed creating owned microvmreplicaset")
 			mvmDeploymentScope.SetNotReady(infrav1.MicrovmDeploymentProvisionFailedReason, "Error", "")
@@ -223,25 +249,6 @@ func (r *MicrovmDeploymentReconciler) reconcileNormal(
 		}
 
 		mvmDeploymentScope.SetNotReady(infrav1.MicrovmDeploymentIncompleteReason, "Info", "")
-	// if we are here then a scale down has been requested.
-	// we delete the first found until the numbers balance out.
-	// TODO the way this works is very naive and often ends up deleting everything
-	// if the timing is wrong/right, find a better way https://github.com/weaveworks-liquidmetal/microvm-operator/issues/17
-	case createdSets > mvmDeploymentScope.RequiredSets():
-		mvmDeploymentScope.Info("MicrovmDeployment updating: delete microvmreplicaset")
-		mvmDeploymentScope.SetNotReady(infrav1.MicrovmDeploymentUpdatingReason, "Info", "")
-
-		rs := rsList[0]
-		if !rs.DeletionTimestamp.IsZero() {
-			return ctrl.Result{}, nil
-		}
-
-		if err := r.Delete(ctx, &rs); err != nil {
-			mvmDeploymentScope.Error(err, "failed deleting microvmreplicaset")
-			mvmDeploymentScope.SetNotReady(infrav1.MicrovmDeploymentUpdateFailedReason, "Error", "")
-
-			return ctrl.Result{}, err
-		}
 	// if all desired objects have been created, but are not quite ready yet,
 	// set the condition and requeue
 	default:

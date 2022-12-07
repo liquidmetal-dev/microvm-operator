@@ -125,6 +125,15 @@ func (m *MicrovmDeploymentScope) DetermineHost(setHosts infrav1.HostMap) (microv
 	return microvm.Host{}, errors.New("could not find free host")
 }
 
+// ExpiredHosts returns hosts which have been removed from the spec
+func (m *MicrovmDeploymentScope) ExpiredHosts(setHosts infrav1.HostMap) infrav1.HostMap {
+	for _, host := range m.Hosts() {
+		delete(setHosts, host.Endpoint)
+	}
+
+	return setHosts
+}
+
 // SetCreatedReplicas records the number of microvms which have been created
 // this does not give information about whether the microvms are ready
 func (m *MicrovmDeploymentScope) SetCreatedReplicas(count int32) {

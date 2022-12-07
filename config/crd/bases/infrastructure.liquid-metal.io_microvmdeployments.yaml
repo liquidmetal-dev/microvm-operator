@@ -344,8 +344,8 @@ spec:
                 description: Ready is true when all Replicas report ready
                 type: boolean
               readyReplicas:
-                description: ReadyReplicas is the number of pods targeted by this
-                  ReplicaSet with a Ready Condition.
+                description: ReadyReplicas is the number of microvms controlled by
+                  this Deployment with a Ready Condition.
                 format: int32
                 type: integer
               replicas:

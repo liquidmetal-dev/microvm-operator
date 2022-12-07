@@ -342,7 +342,7 @@ spec:
                 description: Ready is true when Replicas is Equal to ReadyReplicas.
                 type: boolean
               readyReplicas:
-                description: ReadyReplicas is the number of pods targeted by this
+                description: ReadyReplicas is the number of microvms targeted by this
                   ReplicaSet with a Ready Condition.
                 format: int32
                 type: integer
