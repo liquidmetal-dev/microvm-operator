@@ -55,7 +55,7 @@ type MicrovmReplicaSetStatus struct {
 	// +optional
 	Replicas int32 `json:"replicas"`
 
-	// ReadyReplicas is the number of pods targeted by this ReplicaSet with a Ready Condition.
+	// ReadyReplicas is the number of microvms targeted by this ReplicaSet with a Ready Condition.
 	// +optional
 	ReadyReplicas int32 `json:"readyReplicas,omitempty"`
 

@@ -22,6 +22,14 @@ import (
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 )
 
+const (
+	// MvDeploymentSFinalizer allows ReconcileMicrovmDeployment to clean up resources associated with the Deployment
+	// before removing it from the apiserver.
+	MvmDeploymentFinalizer = "microvmdeployment.infrastructure.microvm.x-k8s.io"
+)
+
+type HostMap map[string]struct{}
+
 // MicrovmDeploymentSpec defines the desired state of MicrovmDeployment
 type MicrovmDeploymentSpec struct {
 	// Replicas is the number of Microvms to create on the given Host with the given
@@ -49,7 +57,7 @@ type MicrovmDeploymentStatus struct {
 	// +optional
 	Replicas int32 `json:"replicas"`
 
-	// ReadyReplicas is the number of pods targeted by this ReplicaSet with a Ready Condition.
+	// ReadyReplicas is the number of microvms controlled by this Deployment with a Ready Condition.
 	// +optional
 	ReadyReplicas int32 `json:"readyReplicas,omitempty"`
 

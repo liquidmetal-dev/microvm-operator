@@ -159,7 +159,6 @@ func (m *MicrovmScope) GetBasicAuthToken() (string, error) {
 
 	// If it's not there, that's fine; we will log and return an empty string
 	token := string(tokenSecret.Data["token"])
-	fmt.Println(tokenSecret.Data)
 
 	if token == "" {
 		m.Info(

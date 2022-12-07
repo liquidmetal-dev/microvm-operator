@@ -42,4 +42,13 @@ const (
 
 	// MicrovmReplicaSetUpdatingReason indicates the microvm is in a pending state.
 	MicrovmReplicaSetUpdatingReason = "MicrovmReplicaSetUpdating"
+
+	// MicrovmDeploymentReadyCondition indicates that the microvmreplicaset is in a complete state.
+	MicrovmDeploymentReadyCondition clusterv1.ConditionType = "MicrovmDeploymentReady"
+
+	// MicrovmDeploymentIncompleteReason indicates the microvmreplicaset does not have all replicas yet.
+	MicrovmDeploymentIncompleteReason = "MicrovmDeploymentIncomplete"
+
+	// MicrovmDeploymentProvisionFailedReason indicates that the microvm deployment failed to provision.
+	MicrovmDeploymentProvisionFailedReason = "MicrovmDeploymentProvisionFailed"
 )
