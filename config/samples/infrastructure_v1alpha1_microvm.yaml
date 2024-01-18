@@ -21,7 +21,7 @@ spec:
     echo "hi from my microvm!"
   kernel:
     filename: boot/vmlinux
-    image: ghcr.io/weaveworks-liquidmetal/flintlock-kernel:5.10.77
+    image: ghcr.io/liquidmetal-dev/flintlock-kernel:5.10.77
   kernelCmdline: {}
   memoryMb: 2048
   vcpu: 2
@@ -30,4 +30,4 @@ spec:
     type: macvtap
   rootVolume:
     id: root
-    image: ghcr.io/weaveworks-liquidmetal/capmvm-kubernetes:1.21.8
+    image: ghcr.io/liquidmetal-dev/capmvm-kubernetes:1.21.8

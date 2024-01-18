@@ -1,5 +1,5 @@
 /*
-Copyright 2022 Weaveworks.
+Copyright 2022 Liquid Metal Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
-	flclient "github.com/weaveworks-liquidmetal/controller-pkg/client"
-	microvm "github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
+	flclient "github.com/liquidmetal-dev/controller-pkg/client"
+	microvm "github.com/liquidmetal-dev/controller-pkg/types/microvm"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 )

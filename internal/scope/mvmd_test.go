@@ -9,9 +9,9 @@ import (
 
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
-	microvm "github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
-	infrav1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
-	"github.com/weaveworks-liquidmetal/microvm-operator/internal/scope"
+	microvm "github.com/liquidmetal-dev/controller-pkg/types/microvm"
+	infrav1 "github.com/liquidmetal-dev/microvm-operator/api/v1alpha1"
+	"github.com/liquidmetal-dev/microvm-operator/internal/scope"
 )
 
 func TestDetermineHost(t *testing.T) {

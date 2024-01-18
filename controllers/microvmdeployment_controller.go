@@ -1,5 +1,5 @@
 /*
-Copyright 2022 Weaveworks.
+Copyright 2022 Liquid Metal Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,11 +30,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
-	"github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
-	"github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
-	infrastructurev1alpha1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
-	infrav1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
-	"github.com/weaveworks-liquidmetal/microvm-operator/internal/scope"
+	"github.com/liquidmetal-dev/controller-pkg/types/microvm"
+	"github.com/liquidmetal-dev/microvm-operator/api/v1alpha1"
+	infrastructurev1alpha1 "github.com/liquidmetal-dev/microvm-operator/api/v1alpha1"
+	infrav1 "github.com/liquidmetal-dev/microvm-operator/api/v1alpha1"
+	"github.com/liquidmetal-dev/microvm-operator/internal/scope"
 )
 
 // MicrovmDeploymentReconciler reconciles a MicrovmDeployment object

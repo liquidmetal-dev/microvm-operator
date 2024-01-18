@@ -1,5 +1,5 @@
 /*
-Copyright 2022 Weaveworks.
+Copyright 2022 Liquid Metal Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,10 +29,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
-	"github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
-	infrastructurev1alpha1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
-	infrav1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
-	"github.com/weaveworks-liquidmetal/microvm-operator/internal/scope"
+	"github.com/liquidmetal-dev/microvm-operator/api/v1alpha1"
+	infrastructurev1alpha1 "github.com/liquidmetal-dev/microvm-operator/api/v1alpha1"
+	infrav1 "github.com/liquidmetal-dev/microvm-operator/api/v1alpha1"
+	"github.com/liquidmetal-dev/microvm-operator/internal/scope"
 )
 
 // MicrovmReplicaSetReconciler reconciles a MicrovmReplicaSet object
@@ -202,7 +202,7 @@ func (r *MicrovmReplicaSetReconciler) reconcileNormal(
 	// if we are here then a scale down has been requested.
 	// we delete the first found until the numbers balance out.
 	// TODO the way this works is very naive and often ends up deleting everything
-	// if the timing is wrong/right, find a better way https://github.com/weaveworks-liquidmetal/microvm-operator/issues/17
+	// if the timing is wrong/right, find a better way https://github.com/liquidmetal-dev/microvm-operator/issues/17
 	case mvmReplicaSetScope.CreatedReplicas() > mvmReplicaSetScope.DesiredReplicas():
 		mvmReplicaSetScope.Info("MicrovmReplicaSet updating: delete microvm")
 		mvmReplicaSetScope.SetNotReady(infrav1.MicrovmReplicaSetUpdatingReason, "Info", "")

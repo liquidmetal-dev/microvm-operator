@@ -1,4 +1,4 @@
-// Copyright 2022 Weaveworks or its affiliates. All Rights Reserved.
+// Copyright 2022 Liquid Metal Authors or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MPL-2.0
 
 package scope
@@ -14,9 +14,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/go-logr/logr"
-	microvm "github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
-	infrav1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
-	"github.com/weaveworks-liquidmetal/microvm-operator/internal/defaults"
+	microvm "github.com/liquidmetal-dev/controller-pkg/types/microvm"
+	infrav1 "github.com/liquidmetal-dev/microvm-operator/api/v1alpha1"
+	"github.com/liquidmetal-dev/microvm-operator/internal/defaults"
 )
 
 type MicrovmDeploymentScopeParams struct {
