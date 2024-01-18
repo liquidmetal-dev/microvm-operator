@@ -6,8 +6,8 @@ import (
 	"github.com/go-logr/logr/testr"
 	. "github.com/onsi/gomega"
 
-	flclient "github.com/weaveworks-liquidmetal/controller-pkg/client"
-	"github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
+	flclient "github.com/liquidmetal-dev/controller-pkg/client"
+	"github.com/liquidmetal-dev/controller-pkg/types/microvm"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -16,8 +16,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
-	infrav1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
-	"github.com/weaveworks-liquidmetal/microvm-operator/internal/scope"
+	infrav1 "github.com/liquidmetal-dev/microvm-operator/api/v1alpha1"
+	"github.com/liquidmetal-dev/microvm-operator/internal/scope"
 )
 
 func TestMicrovmProviderID(t *testing.T) {

@@ -1,5 +1,5 @@
 /*
-Copyright 2022 Weaveworks.
+Copyright 2022 Liquid Metal Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,10 +22,10 @@ import (
 	"strings"
 	"time"
 
-	flclient "github.com/weaveworks-liquidmetal/controller-pkg/client"
-	flservice "github.com/weaveworks-liquidmetal/controller-pkg/services/microvm"
-	"github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
-	flintlocktypes "github.com/weaveworks-liquidmetal/flintlock/api/types"
+	flclient "github.com/liquidmetal-dev/controller-pkg/client"
+	flservice "github.com/liquidmetal-dev/controller-pkg/services/microvm"
+	"github.com/liquidmetal-dev/controller-pkg/types/microvm"
+	flintlocktypes "github.com/liquidmetal-dev/flintlock/api/types"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -34,8 +34,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
-	infrav1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
-	"github.com/weaveworks-liquidmetal/microvm-operator/internal/scope"
+	infrav1 "github.com/liquidmetal-dev/microvm-operator/api/v1alpha1"
+	"github.com/liquidmetal-dev/microvm-operator/internal/scope"
 )
 
 const (

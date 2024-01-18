@@ -1,4 +1,4 @@
-// Copyright 2022 Weaveworks or its affiliates. All Rights Reserved.
+// Copyright 2022 Liquid Metal Authors or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MPL-2.0.
 
 package controllers_test
@@ -23,14 +23,14 @@ import (
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/cluster-api/util/conditions"
 
-	flclient "github.com/weaveworks-liquidmetal/controller-pkg/client"
-	"github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
-	flintlockv1 "github.com/weaveworks-liquidmetal/flintlock/api/services/microvm/v1alpha1"
-	flintlocktypes "github.com/weaveworks-liquidmetal/flintlock/api/types"
-	"github.com/weaveworks-liquidmetal/flintlock/client/cloudinit/userdata"
-	infrav1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
-	"github.com/weaveworks-liquidmetal/microvm-operator/controllers"
-	"github.com/weaveworks-liquidmetal/microvm-operator/controllers/fakes"
+	flclient "github.com/liquidmetal-dev/controller-pkg/client"
+	"github.com/liquidmetal-dev/controller-pkg/types/microvm"
+	flintlockv1 "github.com/liquidmetal-dev/flintlock/api/services/microvm/v1alpha1"
+	flintlocktypes "github.com/liquidmetal-dev/flintlock/api/types"
+	"github.com/liquidmetal-dev/flintlock/client/cloudinit/userdata"
+	infrav1 "github.com/liquidmetal-dev/microvm-operator/api/v1alpha1"
+	"github.com/liquidmetal-dev/microvm-operator/controllers"
+	"github.com/liquidmetal-dev/microvm-operator/controllers/fakes"
 )
 
 const (

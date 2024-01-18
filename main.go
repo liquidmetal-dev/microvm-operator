@@ -1,5 +1,5 @@
 /*
-Copyright 2022 Weaveworks.
+Copyright 2022 Liquid Metal Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,10 +31,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	"github.com/weaveworks-liquidmetal/controller-pkg/client"
+	"github.com/liquidmetal-dev/controller-pkg/client"
 
-	infrastructurev1alpha1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
-	"github.com/weaveworks-liquidmetal/microvm-operator/controllers"
+	infrastructurev1alpha1 "github.com/liquidmetal-dev/microvm-operator/api/v1alpha1"
+	"github.com/liquidmetal-dev/microvm-operator/controllers"
 	//+kubebuilder:scaffold:imports
 )
 

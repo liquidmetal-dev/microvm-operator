@@ -1,4 +1,4 @@
-module github.com/weaveworks-liquidmetal/microvm-operator
+module github.com/liquidmetal-dev/microvm-operator
 
 go 1.19
 
@@ -6,11 +6,11 @@ require (
 	github.com/go-logr/logr v1.2.3
 	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.20.0
-	github.com/weaveworks-liquidmetal/controller-pkg/client v0.0.0-20221118161315-83de77687232
-	github.com/weaveworks-liquidmetal/controller-pkg/services/microvm v0.0.0-20221118161315-83de77687232
-	github.com/weaveworks-liquidmetal/controller-pkg/types/microvm v0.0.0-20221118161315-83de77687232
-	github.com/weaveworks-liquidmetal/flintlock/api v0.0.0-20221108110312-4cf137879fb2
-	github.com/weaveworks-liquidmetal/flintlock/client v0.0.0-20221108110312-4cf137879fb2
+	github.com/liquidmetal-dev/controller-pkg/client v0.0.0-20221118161315-83de77687232
+	github.com/liquidmetal-dev/controller-pkg/services/microvm v0.0.0-20221118161315-83de77687232
+	github.com/liquidmetal-dev/controller-pkg/types/microvm v0.0.0-20221118161315-83de77687232
+	github.com/liquidmetal-dev/flintlock/api v0.0.0-20221108110312-4cf137879fb2
+	github.com/liquidmetal-dev/flintlock/client v0.0.0-20221108110312-4cf137879fb2
 	google.golang.org/grpc v1.50.1
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/yaml.v2 v2.4.0

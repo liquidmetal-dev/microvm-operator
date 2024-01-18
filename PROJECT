@@ -2,7 +2,7 @@ domain: liquid-metal.io
 layout:
 - go.kubebuilder.io/v3
 projectName: microvm-operator
-repo: github.com/weaveworks-liquidmetal/microvm-operator
+repo: github.com/liquidmetal-dev/microvm-operator
 resources:
 - api:
     crdVersion: v1
@@ -11,7 +11,7 @@ resources:
   domain: liquid-metal.io
   group: infrastructure
   kind: Microvm
-  path: github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1
+  path: github.com/liquidmetal-dev/microvm-operator/api/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -20,7 +20,7 @@ resources:
   domain: liquid-metal.io
   group: infrastructure
   kind: MicrovmReplicaSet
-  path: github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1
+  path: github.com/liquidmetal-dev/microvm-operator/api/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -28,7 +28,7 @@ resources:
   domain: liquid-metal.io
   group: infrastructure
   kind: MicrovmTemplate
-  path: github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1
+  path: github.com/liquidmetal-dev/microvm-operator/api/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -37,6 +37,6 @@ resources:
   domain: liquid-metal.io
   group: infrastructure
   kind: MicrovmDeployment
-  path: github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1
+  path: github.com/liquidmetal-dev/microvm-operator/api/v1alpha1
   version: v1alpha1
 version: "3"
