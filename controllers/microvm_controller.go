@@ -22,10 +22,10 @@ import (
 	"strings"
 	"time"
 
-	flclient "github.com/weaveworks-liquidmetal/controller-pkg/client"
-	flservice "github.com/weaveworks-liquidmetal/controller-pkg/services/microvm"
-	"github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
-	flintlocktypes "github.com/weaveworks-liquidmetal/flintlock/api/types"
+	flclient "github.com/liquidmetal-dev/controller-pkg/client"
+	flservice "github.com/liquidmetal-dev/controller-pkg/services/microvm"
+	"github.com/liquidmetal-dev/controller-pkg/types/microvm"
+	flintlocktypes "github.com/liquidmetal-dev/flintlock/api/types"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -266,6 +266,7 @@ func (r *MicrovmReconciler) parseMicroVMState(
 		mvmScope.MicroVM.Status.VMState = &microvm.VMStateFailed
 		mvmScope.SetNotReady(infrav1.MicrovmProvisionFailedReason,
 			"Error",
+			"%s",
 			errMicrovmFailed.Error(),
 		)
 
@@ -281,6 +282,7 @@ func (r *MicrovmReconciler) parseMicroVMState(
 		mvmScope.SetNotReady(
 			infrav1.MicrovmUnknownStateReason,
 			"Error",
+			"%s",
 			errMicrovmUnknownState.Error(),
 		)
 

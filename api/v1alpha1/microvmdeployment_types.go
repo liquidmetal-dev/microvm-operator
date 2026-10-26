@@ -17,9 +17,9 @@ limitations under the License.
 package v1alpha1
 
 import (
-	microvm "github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
+	microvm "github.com/liquidmetal-dev/controller-pkg/types/microvm"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
+	clusterv1 "sigs.k8s.io/cluster-api/api/core/v1beta2"
 )
 
 const (
@@ -93,12 +93,12 @@ func init() {
 	SchemeBuilder.Register(&MicrovmDeployment{}, &MicrovmDeploymentList{})
 }
 
-// GetConditions returns the observations of the operational state of the MicrovmMachine resource.
-func (r *MicrovmDeployment) GetConditions() clusterv1.Conditions {
+// GetV1Beta1Conditions returns the observations of the operational state of the MicrovmMachine resource.
+func (r *MicrovmDeployment) GetV1Beta1Conditions() clusterv1.Conditions {
 	return r.Status.Conditions
 }
 
-// SetConditions sets the underlying service state of the MicrovmMachine to the predescribed clusterv1.Conditions.
-func (r *MicrovmDeployment) SetConditions(conditions clusterv1.Conditions) {
+// SetV1Beta1Conditions sets the underlying service state of the MicrovmMachine to the predescribed clusterv1.Conditions.
+func (r *MicrovmDeployment) SetV1Beta1Conditions(conditions clusterv1.Conditions) {
 	r.Status.Conditions = conditions
 }

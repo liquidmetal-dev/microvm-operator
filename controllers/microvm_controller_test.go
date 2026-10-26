@@ -6,14 +6,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/liquidmetal-dev/controller-pkg/types/microvm"
+	flintlocktypes "github.com/liquidmetal-dev/flintlock/api/types"
 	. "github.com/onsi/gomega"
-	"github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
-	flintlocktypes "github.com/weaveworks-liquidmetal/flintlock/api/types"
 	infrav1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
 	"github.com/weaveworks-liquidmetal/microvm-operator/controllers/fakes"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 )
 
 func TestMicrovm_Reconcile_MissingObject(t *testing.T) {
@@ -154,7 +154,7 @@ func TestMicrovm_ReconcileNormal_NoVmCreateSucceeds(t *testing.T) {
 	g.Expect(err).NotTo(HaveOccurred(), "Getting microvm should not fail")
 
 	expectedProviderID := fmt.Sprintf("microvm://127.0.0.1:9090/%s", testMicrovmUID)
-	g.Expect(reconciled.Spec.ProviderID).To(Equal(pointer.String(expectedProviderID)))
+	g.Expect(reconciled.Spec.ProviderID).To(Equal(ptr.To(expectedProviderID)))
 
 	assertConditionFalse(g, reconciled, infrav1.MicrovmReadyCondition, infrav1.MicrovmPendingReason)
 	assertVMState(g, reconciled, microvm.VMStatePending)
@@ -167,7 +167,7 @@ func TestMicrovm_ReconcileNormal_NoVmCreateWithUserdataSucceeds(t *testing.T) {
 
 	mvm := createMicrovm()
 	mvm.Spec.ProviderID = nil
-	mvm.Spec.UserData = pointer.String(testBootstrapData)
+	mvm.Spec.UserData = ptr.To(testBootstrapData)
 
 	fakeAPIClient := fakes.FakeClient{}
 	withMissingMicrovm(&fakeAPIClient)
@@ -279,7 +279,7 @@ func TestMicrovm_ReconcileDelete_Succeeds(t *testing.T) {
 	mvm.DeletionTimestamp = &metav1.Time{
 		Time: time.Now(),
 	}
-	mvm.Spec.ProviderID = pointer.String(fmt.Sprintf("microvm://127.0.0.1:9090/%s", testMicrovmUID))
+	mvm.Spec.ProviderID = ptr.To(fmt.Sprintf("microvm://127.0.0.1:9090/%s", testMicrovmUID))
 	mvm.Finalizers = []string{infrav1.MvmFinalizer}
 
 	fakeAPIClient := fakes.FakeClient{}

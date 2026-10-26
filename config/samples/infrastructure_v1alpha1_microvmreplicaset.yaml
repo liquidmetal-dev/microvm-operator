@@ -34,3 +34,23 @@ spec:
       rootVolume:
         id: root
         image: ghcr.io/weaveworks-liquidmetal/capmvm-kubernetes:1.21.8
+      # The fields below require flintlock v0.16.0 or newer on the host.
+      # provider selects the microvm provider on the host (e.g. firecracker,
+      # cloudhypervisor). Leave unset to use the host's default provider.
+      # provider: firecracker
+      # allowGuestAgent attaches a vsock device so the in-guest guest-agent can
+      # talk to the host.
+      # allowGuestAgent: true
+      # cpuConfig tunes the CPU features presented to the guest; accepted values
+      # are provider specific.
+      # cpuConfig:
+      #   featuresToEnable: ["amx"]
+      #   kvmCapabilitiesToDisable: []
+      # Additional volumes can come from a container image or a virtiofs share and
+      # may be mounted at a guest path.
+      # additionalVolumes:
+      # - id: data
+      #   image: ghcr.io/example/data:latest
+      #   mountPoint: /mnt/data
+      # - id: shared
+      #   virtiofsPath: /mnt/shared

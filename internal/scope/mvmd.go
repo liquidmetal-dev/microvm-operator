@@ -8,13 +8,13 @@ import (
 	"errors"
 	"fmt"
 
-	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
-	"sigs.k8s.io/cluster-api/util/conditions"
+	clusterv1 "sigs.k8s.io/cluster-api/api/core/v1beta2"
+	conditions "sigs.k8s.io/cluster-api/util/conditions/deprecated/v1beta1"
 	"sigs.k8s.io/cluster-api/util/patch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/go-logr/logr"
-	microvm "github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
+	microvm "github.com/liquidmetal-dev/controller-pkg/types/microvm"
 	infrav1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
 	"github.com/weaveworks-liquidmetal/microvm-operator/internal/defaults"
 )

@@ -3,7 +3,7 @@
 
 package v1alpha1
 
-import clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
+import clusterv1 "sigs.k8s.io/cluster-api/api/core/v1beta2"
 
 const (
 	// MicrovmReadyCondition indicates that the microvm is in a running state.

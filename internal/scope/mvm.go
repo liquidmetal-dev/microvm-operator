@@ -6,14 +6,14 @@ package scope
 import (
 	"context"
 	"fmt"
+	"strings"
 
-	flclient "github.com/weaveworks-liquidmetal/controller-pkg/client"
-	microvm "github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
+	flclient "github.com/liquidmetal-dev/controller-pkg/client"
+	microvm "github.com/liquidmetal-dev/controller-pkg/types/microvm"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
-	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
-	"sigs.k8s.io/cluster-api/controllers/noderefutil"
-	"sigs.k8s.io/cluster-api/util/conditions"
+	clusterv1 "sigs.k8s.io/cluster-api/api/core/v1beta2"
+	conditions "sigs.k8s.io/cluster-api/util/conditions/deprecated/v1beta1"
 	"sigs.k8s.io/cluster-api/util/patch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -87,12 +87,24 @@ func (m *MicrovmScope) Namespace() string {
 
 // GetInstanceID gets the instance ID (i.e. UID) of the mvm.
 func (m *MicrovmScope) GetInstanceID() string {
-	parsed, err := noderefutil.NewProviderID(m.GetProviderID())
-	if err != nil {
+	return instanceIDFromProviderID(m.GetProviderID())
+}
+
+// instanceIDFromProviderID extracts the microvm UID from a provider ID of the
+// form "microvm://<endpoint>/<uid>". It returns an empty string when the
+// provider ID is empty, has the wrong prefix or carries no UID.
+func instanceIDFromProviderID(providerID string) string {
+	rest, ok := strings.CutPrefix(providerID, ProviderPrefix)
+	if !ok || rest == "" {
 		return ""
 	}
 
-	return parsed.ID()
+	idx := strings.LastIndex(rest, "/")
+	if idx < 0 || idx == len(rest)-1 {
+		return ""
+	}
+
+	return rest[idx+1:]
 }
 
 // GetMicrovmSpec returns the spec for the MicroVM

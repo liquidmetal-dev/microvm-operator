@@ -6,13 +6,12 @@ import (
 	"github.com/go-logr/logr/testr"
 	. "github.com/onsi/gomega"
 
-	flclient "github.com/weaveworks-liquidmetal/controller-pkg/client"
-	"github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
+	flclient "github.com/liquidmetal-dev/controller-pkg/client"
+	"github.com/liquidmetal-dev/controller-pkg/types/microvm"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
@@ -29,7 +28,7 @@ func TestMicrovmProviderID(t *testing.T) {
 	mvmName := "m-1"
 	mvm := newMicrovm(mvmName, "")
 
-	client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(mvm).Build()
+	client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(mvm).WithStatusSubresource(&infrav1.Microvm{}).Build()
 	mvmScope, err := scope.NewMicrovmScope(scope.MicrovmScopeParams{
 		Client:  client,
 		MicroVM: mvm,
@@ -51,7 +50,7 @@ func TestMicrovmGetInstanceID(t *testing.T) {
 	providerID := "microvm://fd1/" + uid
 	mvm := newMicrovm(mvmName, providerID)
 
-	client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(mvm).Build()
+	client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(mvm).WithStatusSubresource(&infrav1.Microvm{}).Build()
 	mvmScope, err := scope.NewMicrovmScope(scope.MicrovmScopeParams{
 		Client:  client,
 		MicroVM: mvm,
@@ -60,6 +59,26 @@ func TestMicrovmGetInstanceID(t *testing.T) {
 
 	instanceID := mvmScope.GetInstanceID()
 	Expect(instanceID).To(Equal(uid))
+}
+
+func TestMicrovmGetInstanceIDMalformed(t *testing.T) {
+	RegisterTestingT(t)
+
+	scheme, err := setupScheme()
+	Expect(err).NotTo(HaveOccurred())
+
+	for _, providerID := range []string{"", "microvm://", "microvm://fd1/", "aws://fd1/abcdef"} {
+		mvm := newMicrovm("m-1", providerID)
+
+		client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(mvm).WithStatusSubresource(&infrav1.Microvm{}).Build()
+		mvmScope, err := scope.NewMicrovmScope(scope.MicrovmScopeParams{
+			Client:  client,
+			MicroVM: mvm,
+		})
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(mvmScope.GetInstanceID()).To(BeEmpty(), "providerID %q", providerID)
+	}
 }
 
 // This is all temporary
@@ -133,7 +152,7 @@ func TestMicrovmGetBasicAuthToken(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			RegisterTestingT(t)
-			client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(tc.initObjects...).Build()
+			client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(tc.initObjects...).WithStatusSubresource(&infrav1.Microvm{}).Build()
 			mvmScope, err := scope.NewMicrovmScope(scope.MicrovmScopeParams{
 				Client:  client,
 				MicroVM: tc.mvm,
@@ -230,7 +249,7 @@ func TestMicrovmGetTLSConfig(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			RegisterTestingT(t)
-			client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(tc.initObjects...).Build()
+			client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(tc.initObjects...).WithStatusSubresource(&infrav1.Microvm{}).Build()
 			mvm, err := scope.NewMicrovmScope(scope.MicrovmScopeParams{
 				Client:  client,
 				MicroVM: tc.mvm,
@@ -248,37 +267,10 @@ func setupScheme() (*runtime.Scheme, error) {
 	if err := infrav1.AddToScheme(scheme); err != nil {
 		return nil, err
 	}
-	if err := clusterv1.AddToScheme(scheme); err != nil {
-		return nil, err
-	}
 	if err := corev1.AddToScheme(scheme); err != nil {
 		return nil, err
 	}
 	return scheme, nil
-}
-
-func newCluster(name string, failureDomains []string) *clusterv1.Cluster {
-	cluster := &clusterv1.Cluster{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: "default",
-		},
-	}
-
-	if len(failureDomains) > 0 {
-		cluster.Status = clusterv1.ClusterStatus{
-			FailureDomains: make(clusterv1.FailureDomains),
-		}
-
-		for i := range failureDomains {
-			fd := failureDomains[i]
-			cluster.Status.FailureDomains[fd] = clusterv1.FailureDomainSpec{
-				ControlPlane: true,
-			}
-		}
-	}
-
-	return cluster
 }
 
 func newMicrovm(name string, providerID string) *infrav1.Microvm {
