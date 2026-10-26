@@ -9,7 +9,7 @@ import (
 
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
-	microvm "github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
+	microvm "github.com/liquidmetal-dev/controller-pkg/types/microvm"
 	infrav1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
 	"github.com/weaveworks-liquidmetal/microvm-operator/internal/scope"
 )
@@ -60,7 +60,7 @@ func TestDetermineHost(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			mvmDep := newDeployment(mvmDepName, tc.hostCount)
 
-			client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(mvmDep).Build()
+			client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(mvmDep).WithStatusSubresource(&infrav1.MicrovmDeployment{}).Build()
 			mvmScope, err := scope.NewMicrovmDeploymentScope(scope.MicrovmDeploymentScopeParams{
 				Client:            client,
 				MicrovmDeployment: mvmDep,
@@ -88,7 +88,7 @@ func TestExpiredHosts(t *testing.T) {
 		{Endpoint: "1"}, {Endpoint: "2"},
 	}
 
-	client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(mvmDep).Build()
+	client := fake.NewClientBuilder().WithScheme(scheme).WithObjects(mvmDep).WithStatusSubresource(&infrav1.MicrovmDeployment{}).Build()
 	mvmScope, err := scope.NewMicrovmDeploymentScope(scope.MicrovmDeploymentScopeParams{
 		Client:            client,
 		MicrovmDeployment: mvmDep,

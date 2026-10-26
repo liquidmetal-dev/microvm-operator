@@ -5,25 +5,20 @@ import (
 	"context"
 	"sync"
 
-	"github.com/weaveworks-liquidmetal/controller-pkg/client"
-	"github.com/weaveworks-liquidmetal/flintlock/api/services/microvm/v1alpha1"
+	"github.com/liquidmetal-dev/controller-pkg/client"
+	"github.com/liquidmetal-dev/flintlock/api/services/microvm/v1alpha1"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type FakeClient struct {
-	CloseStub        func()
-	closeMutex       sync.RWMutex
-	closeArgsForCall []struct {
-	}
+	CloseStub                func()
+	closeMutex               sync.RWMutex
+	closeArgsForCall         []struct{}
 	CreateMicroVMStub        func(context.Context, *v1alpha1.CreateMicroVMRequest, ...grpc.CallOption) (*v1alpha1.CreateMicroVMResponse, error)
 	createMicroVMMutex       sync.RWMutex
-	createMicroVMArgsForCall []struct {
-		arg1 context.Context
-		arg2 *v1alpha1.CreateMicroVMRequest
-		arg3 []grpc.CallOption
-	}
-	createMicroVMReturns struct {
+	createMicroVMArgsForCall []FakeClientCreateMicroVMArgs
+	createMicroVMReturns     struct {
 		result1 *v1alpha1.CreateMicroVMResponse
 		result2 error
 	}
@@ -33,12 +28,8 @@ type FakeClient struct {
 	}
 	DeleteMicroVMStub        func(context.Context, *v1alpha1.DeleteMicroVMRequest, ...grpc.CallOption) (*emptypb.Empty, error)
 	deleteMicroVMMutex       sync.RWMutex
-	deleteMicroVMArgsForCall []struct {
-		arg1 context.Context
-		arg2 *v1alpha1.DeleteMicroVMRequest
-		arg3 []grpc.CallOption
-	}
-	deleteMicroVMReturns struct {
+	deleteMicroVMArgsForCall []FakeClientDeleteMicroVMArgs
+	deleteMicroVMReturns     struct {
 		result1 *emptypb.Empty
 		result2 error
 	}
@@ -48,12 +39,8 @@ type FakeClient struct {
 	}
 	GetMicroVMStub        func(context.Context, *v1alpha1.GetMicroVMRequest, ...grpc.CallOption) (*v1alpha1.GetMicroVMResponse, error)
 	getMicroVMMutex       sync.RWMutex
-	getMicroVMArgsForCall []struct {
-		arg1 context.Context
-		arg2 *v1alpha1.GetMicroVMRequest
-		arg3 []grpc.CallOption
-	}
-	getMicroVMReturns struct {
+	getMicroVMArgsForCall []FakeClientGetMicroVMArgs
+	getMicroVMReturns     struct {
 		result1 *v1alpha1.GetMicroVMResponse
 		result2 error
 	}
@@ -63,12 +50,8 @@ type FakeClient struct {
 	}
 	ListMicroVMsStub        func(context.Context, *v1alpha1.ListMicroVMsRequest, ...grpc.CallOption) (*v1alpha1.ListMicroVMsResponse, error)
 	listMicroVMsMutex       sync.RWMutex
-	listMicroVMsArgsForCall []struct {
-		arg1 context.Context
-		arg2 *v1alpha1.ListMicroVMsRequest
-		arg3 []grpc.CallOption
-	}
-	listMicroVMsReturns struct {
+	listMicroVMsArgsForCall []FakeClientListMicroVMsArgs
+	listMicroVMsReturns     struct {
 		result1 *v1alpha1.ListMicroVMsResponse
 		result2 error
 	}
@@ -76,34 +59,83 @@ type FakeClient struct {
 		result1 *v1alpha1.ListMicroVMsResponse
 		result2 error
 	}
-	ListMicroVMsStreamStub        func(context.Context, *v1alpha1.ListMicroVMsRequest, ...grpc.CallOption) (v1alpha1.MicroVM_ListMicroVMsStreamClient, error)
+	ListMicroVMsStreamStub        func(context.Context, *v1alpha1.ListMicroVMsRequest, ...grpc.CallOption) (grpc.ServerStreamingClient[v1alpha1.ListMessage], error)
 	listMicroVMsStreamMutex       sync.RWMutex
-	listMicroVMsStreamArgsForCall []struct {
-		arg1 context.Context
-		arg2 *v1alpha1.ListMicroVMsRequest
-		arg3 []grpc.CallOption
-	}
-	listMicroVMsStreamReturns struct {
-		result1 v1alpha1.MicroVM_ListMicroVMsStreamClient
+	listMicroVMsStreamArgsForCall []FakeClientListMicroVMsStreamArgs
+	listMicroVMsStreamReturns     struct {
+		result1 grpc.ServerStreamingClient[v1alpha1.ListMessage]
 		result2 error
 	}
 	listMicroVMsStreamReturnsOnCall map[int]struct {
-		result1 v1alpha1.MicroVM_ListMicroVMsStreamClient
+		result1 grpc.ServerStreamingClient[v1alpha1.ListMessage]
+		result2 error
+	}
+	ServerInfoStub        func(context.Context, *emptypb.Empty, ...grpc.CallOption) (*v1alpha1.ServerInfoResponse, error)
+	serverInfoMutex       sync.RWMutex
+	serverInfoArgsForCall []FakeClientServerInfoArgs
+	serverInfoReturns     struct {
+		result1 *v1alpha1.ServerInfoResponse
+		result2 error
+	}
+	serverInfoReturnsOnCall map[int]struct {
+		result1 *v1alpha1.ServerInfoResponse
 		result2 error
 	}
 	invocations      map[string][][]interface{}
+	callOrder        []string
 	invocationsMutex sync.RWMutex
+}
+
+// FakeClientCreateMicroVMArgs holds the arguments of one call to CreateMicroVM.
+type FakeClientCreateMicroVMArgs struct {
+	Arg1 context.Context
+	Arg2 *v1alpha1.CreateMicroVMRequest
+	Arg3 []grpc.CallOption
+}
+
+// FakeClientDeleteMicroVMArgs holds the arguments of one call to DeleteMicroVM.
+type FakeClientDeleteMicroVMArgs struct {
+	Arg1 context.Context
+	Arg2 *v1alpha1.DeleteMicroVMRequest
+	Arg3 []grpc.CallOption
+}
+
+// FakeClientGetMicroVMArgs holds the arguments of one call to GetMicroVM.
+type FakeClientGetMicroVMArgs struct {
+	Arg1 context.Context
+	Arg2 *v1alpha1.GetMicroVMRequest
+	Arg3 []grpc.CallOption
+}
+
+// FakeClientListMicroVMsArgs holds the arguments of one call to ListMicroVMs.
+type FakeClientListMicroVMsArgs struct {
+	Arg1 context.Context
+	Arg2 *v1alpha1.ListMicroVMsRequest
+	Arg3 []grpc.CallOption
+}
+
+// FakeClientListMicroVMsStreamArgs holds the arguments of one call to ListMicroVMsStream.
+type FakeClientListMicroVMsStreamArgs struct {
+	Arg1 context.Context
+	Arg2 *v1alpha1.ListMicroVMsRequest
+	Arg3 []grpc.CallOption
+}
+
+// FakeClientServerInfoArgs holds the arguments of one call to ServerInfo.
+type FakeClientServerInfoArgs struct {
+	Arg1 context.Context
+	Arg2 *emptypb.Empty
+	Arg3 []grpc.CallOption
 }
 
 func (fake *FakeClient) Close() {
 	fake.closeMutex.Lock()
-	fake.closeArgsForCall = append(fake.closeArgsForCall, struct {
-	}{})
+	fake.closeArgsForCall = append(fake.closeArgsForCall, struct{}{})
 	stub := fake.CloseStub
 	fake.recordInvocation("Close", []interface{}{})
 	fake.closeMutex.Unlock()
 	if stub != nil {
-		fake.CloseStub()
+		stub()
 	}
 }
 
@@ -120,16 +152,17 @@ func (fake *FakeClient) CloseCalls(stub func()) {
 }
 
 func (fake *FakeClient) CreateMicroVM(arg1 context.Context, arg2 *v1alpha1.CreateMicroVMRequest, arg3 ...grpc.CallOption) (*v1alpha1.CreateMicroVMResponse, error) {
+	var arg3Copy []grpc.CallOption
+	if arg3 != nil {
+		arg3Copy = make([]grpc.CallOption, len(arg3))
+		copy(arg3Copy, arg3)
+	}
 	fake.createMicroVMMutex.Lock()
 	ret, specificReturn := fake.createMicroVMReturnsOnCall[len(fake.createMicroVMArgsForCall)]
-	fake.createMicroVMArgsForCall = append(fake.createMicroVMArgsForCall, struct {
-		arg1 context.Context
-		arg2 *v1alpha1.CreateMicroVMRequest
-		arg3 []grpc.CallOption
-	}{arg1, arg2, arg3})
+	fake.createMicroVMArgsForCall = append(fake.createMicroVMArgsForCall, FakeClientCreateMicroVMArgs{arg1, arg2, arg3Copy})
 	stub := fake.CreateMicroVMStub
 	fakeReturns := fake.createMicroVMReturns
-	fake.recordInvocation("CreateMicroVM", []interface{}{arg1, arg2, arg3})
+	fake.recordInvocation("CreateMicroVM", []interface{}{arg1, arg2, arg3Copy})
 	fake.createMicroVMMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2, arg3...)
@@ -156,7 +189,15 @@ func (fake *FakeClient) CreateMicroVMArgsForCall(i int) (context.Context, *v1alp
 	fake.createMicroVMMutex.RLock()
 	defer fake.createMicroVMMutex.RUnlock()
 	argsForCall := fake.createMicroVMArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.Arg1, argsForCall.Arg2, argsForCall.Arg3
+}
+
+func (fake *FakeClient) CreateMicroVMArgs() []FakeClientCreateMicroVMArgs {
+	fake.createMicroVMMutex.RLock()
+	defer fake.createMicroVMMutex.RUnlock()
+	args := make([]FakeClientCreateMicroVMArgs, len(fake.createMicroVMArgsForCall))
+	copy(args, fake.createMicroVMArgsForCall)
+	return args
 }
 
 func (fake *FakeClient) CreateMicroVMReturns(result1 *v1alpha1.CreateMicroVMResponse, result2 error) {
@@ -186,16 +227,17 @@ func (fake *FakeClient) CreateMicroVMReturnsOnCall(i int, result1 *v1alpha1.Crea
 }
 
 func (fake *FakeClient) DeleteMicroVM(arg1 context.Context, arg2 *v1alpha1.DeleteMicroVMRequest, arg3 ...grpc.CallOption) (*emptypb.Empty, error) {
+	var arg3Copy []grpc.CallOption
+	if arg3 != nil {
+		arg3Copy = make([]grpc.CallOption, len(arg3))
+		copy(arg3Copy, arg3)
+	}
 	fake.deleteMicroVMMutex.Lock()
 	ret, specificReturn := fake.deleteMicroVMReturnsOnCall[len(fake.deleteMicroVMArgsForCall)]
-	fake.deleteMicroVMArgsForCall = append(fake.deleteMicroVMArgsForCall, struct {
-		arg1 context.Context
-		arg2 *v1alpha1.DeleteMicroVMRequest
-		arg3 []grpc.CallOption
-	}{arg1, arg2, arg3})
+	fake.deleteMicroVMArgsForCall = append(fake.deleteMicroVMArgsForCall, FakeClientDeleteMicroVMArgs{arg1, arg2, arg3Copy})
 	stub := fake.DeleteMicroVMStub
 	fakeReturns := fake.deleteMicroVMReturns
-	fake.recordInvocation("DeleteMicroVM", []interface{}{arg1, arg2, arg3})
+	fake.recordInvocation("DeleteMicroVM", []interface{}{arg1, arg2, arg3Copy})
 	fake.deleteMicroVMMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2, arg3...)
@@ -222,7 +264,15 @@ func (fake *FakeClient) DeleteMicroVMArgsForCall(i int) (context.Context, *v1alp
 	fake.deleteMicroVMMutex.RLock()
 	defer fake.deleteMicroVMMutex.RUnlock()
 	argsForCall := fake.deleteMicroVMArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.Arg1, argsForCall.Arg2, argsForCall.Arg3
+}
+
+func (fake *FakeClient) DeleteMicroVMArgs() []FakeClientDeleteMicroVMArgs {
+	fake.deleteMicroVMMutex.RLock()
+	defer fake.deleteMicroVMMutex.RUnlock()
+	args := make([]FakeClientDeleteMicroVMArgs, len(fake.deleteMicroVMArgsForCall))
+	copy(args, fake.deleteMicroVMArgsForCall)
+	return args
 }
 
 func (fake *FakeClient) DeleteMicroVMReturns(result1 *emptypb.Empty, result2 error) {
@@ -252,16 +302,17 @@ func (fake *FakeClient) DeleteMicroVMReturnsOnCall(i int, result1 *emptypb.Empty
 }
 
 func (fake *FakeClient) GetMicroVM(arg1 context.Context, arg2 *v1alpha1.GetMicroVMRequest, arg3 ...grpc.CallOption) (*v1alpha1.GetMicroVMResponse, error) {
+	var arg3Copy []grpc.CallOption
+	if arg3 != nil {
+		arg3Copy = make([]grpc.CallOption, len(arg3))
+		copy(arg3Copy, arg3)
+	}
 	fake.getMicroVMMutex.Lock()
 	ret, specificReturn := fake.getMicroVMReturnsOnCall[len(fake.getMicroVMArgsForCall)]
-	fake.getMicroVMArgsForCall = append(fake.getMicroVMArgsForCall, struct {
-		arg1 context.Context
-		arg2 *v1alpha1.GetMicroVMRequest
-		arg3 []grpc.CallOption
-	}{arg1, arg2, arg3})
+	fake.getMicroVMArgsForCall = append(fake.getMicroVMArgsForCall, FakeClientGetMicroVMArgs{arg1, arg2, arg3Copy})
 	stub := fake.GetMicroVMStub
 	fakeReturns := fake.getMicroVMReturns
-	fake.recordInvocation("GetMicroVM", []interface{}{arg1, arg2, arg3})
+	fake.recordInvocation("GetMicroVM", []interface{}{arg1, arg2, arg3Copy})
 	fake.getMicroVMMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2, arg3...)
@@ -288,7 +339,15 @@ func (fake *FakeClient) GetMicroVMArgsForCall(i int) (context.Context, *v1alpha1
 	fake.getMicroVMMutex.RLock()
 	defer fake.getMicroVMMutex.RUnlock()
 	argsForCall := fake.getMicroVMArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.Arg1, argsForCall.Arg2, argsForCall.Arg3
+}
+
+func (fake *FakeClient) GetMicroVMArgs() []FakeClientGetMicroVMArgs {
+	fake.getMicroVMMutex.RLock()
+	defer fake.getMicroVMMutex.RUnlock()
+	args := make([]FakeClientGetMicroVMArgs, len(fake.getMicroVMArgsForCall))
+	copy(args, fake.getMicroVMArgsForCall)
+	return args
 }
 
 func (fake *FakeClient) GetMicroVMReturns(result1 *v1alpha1.GetMicroVMResponse, result2 error) {
@@ -318,16 +377,17 @@ func (fake *FakeClient) GetMicroVMReturnsOnCall(i int, result1 *v1alpha1.GetMicr
 }
 
 func (fake *FakeClient) ListMicroVMs(arg1 context.Context, arg2 *v1alpha1.ListMicroVMsRequest, arg3 ...grpc.CallOption) (*v1alpha1.ListMicroVMsResponse, error) {
+	var arg3Copy []grpc.CallOption
+	if arg3 != nil {
+		arg3Copy = make([]grpc.CallOption, len(arg3))
+		copy(arg3Copy, arg3)
+	}
 	fake.listMicroVMsMutex.Lock()
 	ret, specificReturn := fake.listMicroVMsReturnsOnCall[len(fake.listMicroVMsArgsForCall)]
-	fake.listMicroVMsArgsForCall = append(fake.listMicroVMsArgsForCall, struct {
-		arg1 context.Context
-		arg2 *v1alpha1.ListMicroVMsRequest
-		arg3 []grpc.CallOption
-	}{arg1, arg2, arg3})
+	fake.listMicroVMsArgsForCall = append(fake.listMicroVMsArgsForCall, FakeClientListMicroVMsArgs{arg1, arg2, arg3Copy})
 	stub := fake.ListMicroVMsStub
 	fakeReturns := fake.listMicroVMsReturns
-	fake.recordInvocation("ListMicroVMs", []interface{}{arg1, arg2, arg3})
+	fake.recordInvocation("ListMicroVMs", []interface{}{arg1, arg2, arg3Copy})
 	fake.listMicroVMsMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2, arg3...)
@@ -354,7 +414,15 @@ func (fake *FakeClient) ListMicroVMsArgsForCall(i int) (context.Context, *v1alph
 	fake.listMicroVMsMutex.RLock()
 	defer fake.listMicroVMsMutex.RUnlock()
 	argsForCall := fake.listMicroVMsArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.Arg1, argsForCall.Arg2, argsForCall.Arg3
+}
+
+func (fake *FakeClient) ListMicroVMsArgs() []FakeClientListMicroVMsArgs {
+	fake.listMicroVMsMutex.RLock()
+	defer fake.listMicroVMsMutex.RUnlock()
+	args := make([]FakeClientListMicroVMsArgs, len(fake.listMicroVMsArgsForCall))
+	copy(args, fake.listMicroVMsArgsForCall)
+	return args
 }
 
 func (fake *FakeClient) ListMicroVMsReturns(result1 *v1alpha1.ListMicroVMsResponse, result2 error) {
@@ -383,17 +451,18 @@ func (fake *FakeClient) ListMicroVMsReturnsOnCall(i int, result1 *v1alpha1.ListM
 	}{result1, result2}
 }
 
-func (fake *FakeClient) ListMicroVMsStream(arg1 context.Context, arg2 *v1alpha1.ListMicroVMsRequest, arg3 ...grpc.CallOption) (v1alpha1.MicroVM_ListMicroVMsStreamClient, error) {
+func (fake *FakeClient) ListMicroVMsStream(arg1 context.Context, arg2 *v1alpha1.ListMicroVMsRequest, arg3 ...grpc.CallOption) (grpc.ServerStreamingClient[v1alpha1.ListMessage], error) {
+	var arg3Copy []grpc.CallOption
+	if arg3 != nil {
+		arg3Copy = make([]grpc.CallOption, len(arg3))
+		copy(arg3Copy, arg3)
+	}
 	fake.listMicroVMsStreamMutex.Lock()
 	ret, specificReturn := fake.listMicroVMsStreamReturnsOnCall[len(fake.listMicroVMsStreamArgsForCall)]
-	fake.listMicroVMsStreamArgsForCall = append(fake.listMicroVMsStreamArgsForCall, struct {
-		arg1 context.Context
-		arg2 *v1alpha1.ListMicroVMsRequest
-		arg3 []grpc.CallOption
-	}{arg1, arg2, arg3})
+	fake.listMicroVMsStreamArgsForCall = append(fake.listMicroVMsStreamArgsForCall, FakeClientListMicroVMsStreamArgs{arg1, arg2, arg3Copy})
 	stub := fake.ListMicroVMsStreamStub
 	fakeReturns := fake.listMicroVMsStreamReturns
-	fake.recordInvocation("ListMicroVMsStream", []interface{}{arg1, arg2, arg3})
+	fake.recordInvocation("ListMicroVMsStream", []interface{}{arg1, arg2, arg3Copy})
 	fake.listMicroVMsStreamMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2, arg3...)
@@ -410,7 +479,7 @@ func (fake *FakeClient) ListMicroVMsStreamCallCount() int {
 	return len(fake.listMicroVMsStreamArgsForCall)
 }
 
-func (fake *FakeClient) ListMicroVMsStreamCalls(stub func(context.Context, *v1alpha1.ListMicroVMsRequest, ...grpc.CallOption) (v1alpha1.MicroVM_ListMicroVMsStreamClient, error)) {
+func (fake *FakeClient) ListMicroVMsStreamCalls(stub func(context.Context, *v1alpha1.ListMicroVMsRequest, ...grpc.CallOption) (grpc.ServerStreamingClient[v1alpha1.ListMessage], error)) {
 	fake.listMicroVMsStreamMutex.Lock()
 	defer fake.listMicroVMsStreamMutex.Unlock()
 	fake.ListMicroVMsStreamStub = stub
@@ -420,31 +489,114 @@ func (fake *FakeClient) ListMicroVMsStreamArgsForCall(i int) (context.Context, *
 	fake.listMicroVMsStreamMutex.RLock()
 	defer fake.listMicroVMsStreamMutex.RUnlock()
 	argsForCall := fake.listMicroVMsStreamArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+	return argsForCall.Arg1, argsForCall.Arg2, argsForCall.Arg3
 }
 
-func (fake *FakeClient) ListMicroVMsStreamReturns(result1 v1alpha1.MicroVM_ListMicroVMsStreamClient, result2 error) {
+func (fake *FakeClient) ListMicroVMsStreamArgs() []FakeClientListMicroVMsStreamArgs {
+	fake.listMicroVMsStreamMutex.RLock()
+	defer fake.listMicroVMsStreamMutex.RUnlock()
+	args := make([]FakeClientListMicroVMsStreamArgs, len(fake.listMicroVMsStreamArgsForCall))
+	copy(args, fake.listMicroVMsStreamArgsForCall)
+	return args
+}
+
+func (fake *FakeClient) ListMicroVMsStreamReturns(result1 grpc.ServerStreamingClient[v1alpha1.ListMessage], result2 error) {
 	fake.listMicroVMsStreamMutex.Lock()
 	defer fake.listMicroVMsStreamMutex.Unlock()
 	fake.ListMicroVMsStreamStub = nil
 	fake.listMicroVMsStreamReturns = struct {
-		result1 v1alpha1.MicroVM_ListMicroVMsStreamClient
+		result1 grpc.ServerStreamingClient[v1alpha1.ListMessage]
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeClient) ListMicroVMsStreamReturnsOnCall(i int, result1 v1alpha1.MicroVM_ListMicroVMsStreamClient, result2 error) {
+func (fake *FakeClient) ListMicroVMsStreamReturnsOnCall(i int, result1 grpc.ServerStreamingClient[v1alpha1.ListMessage], result2 error) {
 	fake.listMicroVMsStreamMutex.Lock()
 	defer fake.listMicroVMsStreamMutex.Unlock()
 	fake.ListMicroVMsStreamStub = nil
 	if fake.listMicroVMsStreamReturnsOnCall == nil {
 		fake.listMicroVMsStreamReturnsOnCall = make(map[int]struct {
-			result1 v1alpha1.MicroVM_ListMicroVMsStreamClient
+			result1 grpc.ServerStreamingClient[v1alpha1.ListMessage]
 			result2 error
 		})
 	}
 	fake.listMicroVMsStreamReturnsOnCall[i] = struct {
-		result1 v1alpha1.MicroVM_ListMicroVMsStreamClient
+		result1 grpc.ServerStreamingClient[v1alpha1.ListMessage]
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeClient) ServerInfo(arg1 context.Context, arg2 *emptypb.Empty, arg3 ...grpc.CallOption) (*v1alpha1.ServerInfoResponse, error) {
+	var arg3Copy []grpc.CallOption
+	if arg3 != nil {
+		arg3Copy = make([]grpc.CallOption, len(arg3))
+		copy(arg3Copy, arg3)
+	}
+	fake.serverInfoMutex.Lock()
+	ret, specificReturn := fake.serverInfoReturnsOnCall[len(fake.serverInfoArgsForCall)]
+	fake.serverInfoArgsForCall = append(fake.serverInfoArgsForCall, FakeClientServerInfoArgs{arg1, arg2, arg3Copy})
+	stub := fake.ServerInfoStub
+	fakeReturns := fake.serverInfoReturns
+	fake.recordInvocation("ServerInfo", []interface{}{arg1, arg2, arg3Copy})
+	fake.serverInfoMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeClient) ServerInfoCallCount() int {
+	fake.serverInfoMutex.RLock()
+	defer fake.serverInfoMutex.RUnlock()
+	return len(fake.serverInfoArgsForCall)
+}
+
+func (fake *FakeClient) ServerInfoCalls(stub func(context.Context, *emptypb.Empty, ...grpc.CallOption) (*v1alpha1.ServerInfoResponse, error)) {
+	fake.serverInfoMutex.Lock()
+	defer fake.serverInfoMutex.Unlock()
+	fake.ServerInfoStub = stub
+}
+
+func (fake *FakeClient) ServerInfoArgsForCall(i int) (context.Context, *emptypb.Empty, []grpc.CallOption) {
+	fake.serverInfoMutex.RLock()
+	defer fake.serverInfoMutex.RUnlock()
+	argsForCall := fake.serverInfoArgsForCall[i]
+	return argsForCall.Arg1, argsForCall.Arg2, argsForCall.Arg3
+}
+
+func (fake *FakeClient) ServerInfoArgs() []FakeClientServerInfoArgs {
+	fake.serverInfoMutex.RLock()
+	defer fake.serverInfoMutex.RUnlock()
+	args := make([]FakeClientServerInfoArgs, len(fake.serverInfoArgsForCall))
+	copy(args, fake.serverInfoArgsForCall)
+	return args
+}
+
+func (fake *FakeClient) ServerInfoReturns(result1 *v1alpha1.ServerInfoResponse, result2 error) {
+	fake.serverInfoMutex.Lock()
+	defer fake.serverInfoMutex.Unlock()
+	fake.ServerInfoStub = nil
+	fake.serverInfoReturns = struct {
+		result1 *v1alpha1.ServerInfoResponse
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeClient) ServerInfoReturnsOnCall(i int, result1 *v1alpha1.ServerInfoResponse, result2 error) {
+	fake.serverInfoMutex.Lock()
+	defer fake.serverInfoMutex.Unlock()
+	fake.ServerInfoStub = nil
+	if fake.serverInfoReturnsOnCall == nil {
+		fake.serverInfoReturnsOnCall = make(map[int]struct {
+			result1 *v1alpha1.ServerInfoResponse
+			result2 error
+		})
+	}
+	fake.serverInfoReturnsOnCall[i] = struct {
+		result1 *v1alpha1.ServerInfoResponse
 		result2 error
 	}{result1, result2}
 }
@@ -452,18 +604,6 @@ func (fake *FakeClient) ListMicroVMsStreamReturnsOnCall(i int, result1 v1alpha1.
 func (fake *FakeClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.closeMutex.RLock()
-	defer fake.closeMutex.RUnlock()
-	fake.createMicroVMMutex.RLock()
-	defer fake.createMicroVMMutex.RUnlock()
-	fake.deleteMicroVMMutex.RLock()
-	defer fake.deleteMicroVMMutex.RUnlock()
-	fake.getMicroVMMutex.RLock()
-	defer fake.getMicroVMMutex.RUnlock()
-	fake.listMicroVMsMutex.RLock()
-	defer fake.listMicroVMsMutex.RUnlock()
-	fake.listMicroVMsStreamMutex.RLock()
-	defer fake.listMicroVMsStreamMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
@@ -471,9 +611,18 @@ func (fake *FakeClient) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
+func (fake *FakeClient) CallOrder() []string {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	order := make([]string, len(fake.callOrder))
+	copy(order, fake.callOrder)
+	return order
+}
+
 func (fake *FakeClient) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
+	fake.callOrder = append(fake.callOrder, key)
 	if fake.invocations == nil {
 		fake.invocations = map[string][][]interface{}{}
 	}

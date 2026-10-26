@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 	infrav1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 )
 
 func TestMicrovmRS_Reconcile_MissingObject(t *testing.T) {
@@ -99,7 +99,7 @@ func TestMicrovmRS_ReconcileNormal_UpdateSucceeds(t *testing.T) {
 	g.Expect(reconciled.Status.ReadyReplicas).To(Equal(initialReplicaCount), "Expected all replicas to be ready")
 
 	// update, scale down to 1
-	reconciled.Spec.Replicas = pointer.Int32(scaledReplicaCount)
+	reconciled.Spec.Replicas = ptr.To[int32](scaledReplicaCount)
 	g.Expect(client.Update(context.TODO(), reconciled)).To(Succeed())
 
 	// first reconciliation
