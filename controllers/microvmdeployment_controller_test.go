@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/liquidmetal-dev/controller-pkg/types/microvm"
 	. "github.com/onsi/gomega"
-	"github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
 	infrav1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
 )

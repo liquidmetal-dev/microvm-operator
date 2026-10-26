@@ -15,19 +15,19 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
-	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
-	"sigs.k8s.io/cluster-api/util/conditions"
+	clusterv1 "sigs.k8s.io/cluster-api/api/core/v1beta2"
+	conditions "sigs.k8s.io/cluster-api/util/conditions/deprecated/v1beta1"
 
-	flclient "github.com/weaveworks-liquidmetal/controller-pkg/client"
-	"github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
-	flintlockv1 "github.com/weaveworks-liquidmetal/flintlock/api/services/microvm/v1alpha1"
-	flintlocktypes "github.com/weaveworks-liquidmetal/flintlock/api/types"
-	"github.com/weaveworks-liquidmetal/flintlock/client/cloudinit/userdata"
+	flclient "github.com/liquidmetal-dev/controller-pkg/client"
+	"github.com/liquidmetal-dev/controller-pkg/types/microvm"
+	flintlockv1 "github.com/liquidmetal-dev/flintlock/api/services/microvm/v1alpha1"
+	flintlocktypes "github.com/liquidmetal-dev/flintlock/api/types"
+	"github.com/liquidmetal-dev/flintlock/client/cloudinit/userdata"
 	infrav1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
 	"github.com/weaveworks-liquidmetal/microvm-operator/controllers"
 	"github.com/weaveworks-liquidmetal/microvm-operator/controllers/fakes"
@@ -177,7 +177,11 @@ func createFakeClient(g *WithT, objects []runtime.Object) client.Client {
 	g.Expect(infrav1.AddToScheme(scheme)).To(Succeed())
 	g.Expect(corev1.AddToScheme(scheme)).To(Succeed())
 
-	return fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(objects...).Build()
+	return fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithRuntimeObjects(objects...).
+		WithStatusSubresource(&infrav1.Microvm{}, &infrav1.MicrovmReplicaSet{}, &infrav1.MicrovmDeployment{}).
+		Build()
 }
 
 func createMicrovm() *infrav1.Microvm {
@@ -190,7 +194,7 @@ func createMicrovm() *infrav1.Microvm {
 			Host: microvm.Host{
 				Endpoint: "127.0.0.1:9090",
 			},
-			ProviderID: pointer.String(testMicrovmUID),
+			ProviderID: ptr.To(testMicrovmUID),
 			VMSpec: microvm.VMSpec{
 				VCPU:     2,
 				MemoryMb: 2048,
@@ -232,7 +236,7 @@ func createMicrovmReplicaSet(reps int32) *infrav1.MicrovmReplicaSet {
 			Host: microvm.Host{
 				Endpoint: "127.0.0.1:9090",
 			},
-			Replicas: pointer.Int32(reps),
+			Replicas: ptr.To[int32](reps),
 			Template: infrav1.MicrovmTemplateSpec{
 				Spec: mvm.Spec,
 			},
@@ -259,7 +263,7 @@ func createMicrovmDeployment(reps int32, hostCount int) *infrav1.MicrovmDeployme
 		},
 		Spec: infrav1.MicrovmDeploymentSpec{
 			Hosts:    hosts,
-			Replicas: pointer.Int32(reps),
+			Replicas: ptr.To[int32](reps),
 			Template: infrav1.MicrovmTemplateSpec{
 				Spec: mvm.Spec,
 			},
@@ -271,7 +275,7 @@ func withExistingMicrovm(fc *fakes.FakeClient, mvmState flintlocktypes.MicroVMSt
 	fc.GetMicroVMReturns(&flintlockv1.GetMicroVMResponse{
 		Microvm: &flintlocktypes.MicroVM{
 			Spec: &flintlocktypes.MicroVMSpec{
-				Uid: pointer.String(testMicrovmUID),
+				Uid: ptr.To(testMicrovmUID),
 			},
 			Status: &flintlocktypes.MicroVMStatus{
 				State: mvmState,
@@ -288,7 +292,7 @@ func withCreateMicrovmSuccess(fc *fakes.FakeClient) {
 	fc.CreateMicroVMReturns(&flintlockv1.CreateMicroVMResponse{
 		Microvm: &flintlocktypes.MicroVM{
 			Spec: &flintlocktypes.MicroVMSpec{
-				Uid: pointer.String(testMicrovmUID),
+				Uid: ptr.To(testMicrovmUID),
 			},
 			Status: &flintlocktypes.MicroVMStatus{
 				State: flintlocktypes.MicroVMStatus_PENDING,
@@ -360,7 +364,7 @@ func ensureMicrovmState(g *WithT, c client.Client) {
 
 	for _, mvm := range mvmList.Items {
 		mvm.Status.Ready = true
-		g.Expect(c.Update(context.TODO(), &mvm)).To(Succeed())
+		g.Expect(c.Status().Update(context.TODO(), &mvm)).To(Succeed())
 	}
 }
 
@@ -373,7 +377,7 @@ func ensureMicrovmReplicaSetState(g *WithT, c client.Client, r, rr int32) {
 		mvm.Status.Ready = true
 		mvm.Status.ReadyReplicas = rr
 		mvm.Status.Replicas = r
-		g.Expect(c.Update(context.TODO(), &mvm)).To(Succeed())
+		g.Expect(c.Status().Update(context.TODO(), &mvm)).To(Succeed())
 	}
 }
 

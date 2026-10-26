@@ -3,8 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.9.2
-  creationTimestamp: null
+    controller-gen.kubebuilder.io/version: v0.23.0
   name: microvmdeployments.infrastructure.liquid-metal.io
 spec:
   group: infrastructure.liquid-metal.io
@@ -21,14 +20,19 @@ spec:
         description: MicrovmDeployment is the Schema for the microvmdeployments API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
             type: object
@@ -40,8 +44,9 @@ spec:
                 items:
                   properties:
                     endpoint:
-                      description: Endpoint is the API endpoint for the microvm service
-                        (i.e. flintlock) including the port.
+                      description: |-
+                        Endpoint is the API endpoint for the microvm service (i.e. flintlock)
+                        including the port.
                       type: string
                     name:
                       description: Name is an optional name for the host.
@@ -52,36 +57,71 @@ spec:
                 type: array
               replicas:
                 default: 1
-                description: Replicas is the number of Microvms to create on the given
-                  Host with the given Microvm spec
+                description: |-
+                  Replicas is the number of Microvms to create on the given Host with the given
+                  Microvm spec
                 format: int32
                 type: integer
               template:
-                description: 'Template is the object that describes the Microvm that
-                  will be created if insufficient replicas are detected. More info:
-                  https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template'
+                description: |-
+                  Template is the object that describes the Microvm that will be created if
+                  insufficient replicas are detected.
+                  More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template
                 properties:
                   metadata:
                     type: object
                   spec:
                     description: Specification of the desired behavior of the Microvm.
                     properties:
+                      allowGuestAgent:
+                        description: |-
+                          AllowGuestAgent, when true, attaches a vsock device to the microvm so the in-guest
+                          guest-agent can communicate with the host.
+                        type: boolean
                       basicAuthSecret:
-                        description: "TODO this needs to go and be pulled off the
-                          owning object probably needs to be part of Hosts once that
-                          becomes an array BasicAuthSecret is the name of the secret
-                          containing basic auth info for the host The secret should
-                          be created in the same namespace as the MicroVM. \n apiVersion:
-                          v1 kind: Secret metadata: name: mybasicauthsecret namespace:
-                          same-as-microvm type: Opaque data: token: YWRtaW4="
+                        description: |-
+                          probably needs to be part of Hosts once that becomes an array
+                          BasicAuthSecret is the name of the secret containing basic auth info for the host
+                          The secret should be created in the same namespace as the MicroVM.
+
+                          apiVersion: v1
+                          kind: Secret
+                          metadata:
+                           name: mybasicauthsecret
+                           namespace: same-as-microvm
+                          type: Opaque
+                          data:
+                           token: YWRtaW4=
                         type: string
+                      cpuConfig:
+                        description: |-
+                          CPUConfig allows customising the CPU features presented to the guest.
+                          Support and semantics vary by provider.
+                        properties:
+                          featuresToEnable:
+                            description: |-
+                              FeaturesToEnable is a list of optional CPU features to enable. Accepted values are
+                              provider specific (e.g. named features such as "amx" for Cloud Hypervisor, or numeric
+                              KVM capability IDs for Firecracker). The "!" prefix is not allowed here.
+                            items:
+                              type: string
+                            type: array
+                          kvmCapabilitiesToDisable:
+                            description: |-
+                              KVMCapabilitiesToDisable is a list of KVM capability IDs to disable. Only supported by
+                              providers that declare the KVMCapabilitiesDisable capability (currently Firecracker only).
+                            items:
+                              type: string
+                            type: array
+                        type: object
                       host:
                         description: Host sets the host device address for Microvm
                           creation.
                         properties:
                           endpoint:
-                            description: Endpoint is the API endpoint for the microvm
-                              service (i.e. flintlock) including the port.
+                            description: |-
+                              Endpoint is the API endpoint for the microvm service (i.e. flintlock)
+                              including the port.
                             type: string
                           name:
                             description: Name is an optional name for the host.
@@ -119,10 +159,10 @@ spec:
                       kernelCmdline:
                         additionalProperties:
                           type: string
-                        description: KernelCmdLine are the additional args to use
-                          for the kernel cmdline. Each MicroVM provider has its own
-                          recommended list, they will be used automatically. This
-                          field is for additional values.
+                        description: |-
+                          KernelCmdLine are the additional args to use for the kernel cmdline.
+                          Each MicroVM provider has its own recommended list, they will be used
+                          automatically. This field is for additional values.
                         type: object
                       labels:
                         additionalProperties:
@@ -137,10 +177,9 @@ spec:
                         minimum: 1024
                         type: integer
                       microvmProxy:
-                        description: MicrovmProxy is the proxy server details to use
-                          when calling the microvm service. This is an alternative
-                          to using the http proxy environment variables and applied
-                          purely to the grpc service.
+                        description: |-
+                          MicrovmProxy is the proxy server details to use when calling the microvm service. This is an
+                          alternative to using the http proxy environment variables and applied purely to the grpc service.
                         properties:
                           endpoint:
                             description: Endpoint is the address of the proxy.
@@ -165,9 +204,9 @@ spec:
                                 interface to create in the microvm.
                               type: string
                             guestMac:
-                              description: GuestMAC allows the specifying of a specific
-                                MAC address to use for the interface. If not supplied
-                                a autogenerated MAC address will be used.
+                              description: |-
+                                GuestMAC allows the specifying of a specific MAC address to use for the interface. If
+                                not supplied a autogenerated MAC address will be used.
                               type: string
                             type:
                               description: Type is the type of host network interface
@@ -182,9 +221,17 @@ spec:
                           type: object
                         minItems: 1
                         type: array
+                      provider:
+                        description: |-
+                          Provider allows you to specify the name of the microvm provider to use.
+                          If this isn't supplied then the default provider will be used.
+                          NOTE that the default provider cannot be controlled here: it would have been
+                          chosen by the operator configuring Flintlock on the remote host.
+                        type: string
                       providerID:
-                        description: ProviderID is the unique identifier as specified
-                          by the cloud provider. Do not supply this field as a user.
+                        description: |-
+                          ProviderID is the unique identifier as specified by the cloud provider.
+                          Do not supply this field as a user.
                         type: string
                       rootVolume:
                         description: RootVolume specifies the volume to use for the
@@ -194,17 +241,25 @@ spec:
                             description: ID is a unique identifier for this volume.
                             type: string
                           image:
-                            description: Image is the container image to use for the
-                              volume.
+                            description: Image is the container image to use as the
+                              source for the volume.
+                            type: string
+                          mountPoint:
+                            description: |-
+                              MountPoint specifies the guest mountpoint for the volume.
+                              This will only be applied to additional volumes.
                             type: string
                           readOnly:
                             default: false
                             description: ReadOnly specifies that the volume is to
                               be mounted readonly.
                             type: boolean
+                          virtiofsPath:
+                            description: VirtioFSPath specifies the path in the guest
+                              where virtiofs is mounted.
+                            type: string
                         required:
                         - id
-                        - image
                         type: object
                       sshPublicKeys:
                         description: SSHPublicKeys is list of SSH public keys which
@@ -221,35 +276,38 @@ spec:
                               description: User is the name of the user to add keys
                                 for (eg root, ubuntu).
                               type: string
+                          required:
+                          - authorizedKeys
+                          - user
                           type: object
                         type: array
                       tlsSecretRef:
-                        description: "TODO this needs to go and be pulled off the
-                          owning object probably needs to be part of Hosts once that
-                          becomes an array mTLS Configuration: \n It is recommended
-                          that each flintlock host is configured with its own cert
-                          signed by a common CA, and set to use mTLS. The flintlock-operator
-                          should be provided with the CA, and a client cert and key
-                          signed by that CA. TLSSecretRef is a reference to the name
-                          of a secret which contains TLS cert information for connecting
-                          to Flintlock hosts. The secret should be created in the
-                          same namespace as the MicroVMCluster. The secret should
-                          be of type Opaque with the addition of a ca.crt key. \n
-                          apiVersion: v1 kind: Secret metadata: name: secret-tls namespace:
-                          default  <- same as Cluster type: Opaque data: tls.crt:
-                          | -----BEGIN CERTIFICATE----- MIIC2DCCAcCgAwIBAgIBATANBgkqh
-                          ... -----END CERTIFICATE----- tls.key: | -----BEGIN EC PRIVATE
-                          KEY----- MIIEpgIBAAKCAQEA7yn3bRHQ5FHMQ ... -----END EC PRIVATE
-                          KEY----- ca.crt: | -----BEGIN CERTIFICATE----- MIIEpgIBAAKCAQEA7yn3bRHQ5FHMQ
-                          ... -----END CERTIFICATE-----"
+                        description: "probably needs to be part of Hosts once that
+                          becomes an array\nmTLS Configuration:\n\nIt is recommended
+                          that each flintlock host is configured with its own cert\nsigned
+                          by a common CA, and set to use mTLS.\nThe flintlock-operator
+                          should be provided with the CA, and a client cert and key\nsigned
+                          by that CA.\nTLSSecretRef is a reference to the name of
+                          a secret which contains TLS cert information\nfor connecting
+                          to Flintlock hosts.\nThe secret should be created in the
+                          same namespace as the MicroVMCluster.\nThe secret should
+                          be of type Opaque\nwith the addition of a ca.crt key.\n\napiVersion:
+                          v1\nkind: Secret\nmetadata:\n\tname: secret-tls\n\tnamespace:
+                          default  <- same as Cluster\ntype: Opaque\ndata:\n\ttls.crt:
+                          |\n\t\t-----BEGIN CERTIFICATE-----\n\t\tMIIC2DCCAcCgAwIBAgIBATANBgkqh
+                          ...\n\t\t-----END CERTIFICATE-----\n\ttls.key: |\n\t\t-----BEGIN
+                          EC PRIVATE KEY-----\n\t\tMIIEpgIBAAKCAQEA7yn3bRHQ5FHMQ ...\n\t\t-----END
+                          EC PRIVATE KEY-----\n\tca.crt: |\n\t\t-----BEGIN CERTIFICATE-----\n\t\tMIIEpgIBAAKCAQEA7yn3bRHQ5FHMQ
+                          ...\n\t\t-----END CERTIFICATE-----"
                         type: string
                       userdata:
                         description: "UserData is additional userdata script to execute
-                          in the Microvm's cloud init. This can be in the form of
-                          a raw shell script, eg: userdata: | #!/bin/bash echo \"hi
-                          from my microvm\" \n or in valid cloud-config, eg: userdata:
-                          | #cloud-config write_files: - content: \"hello\" path:
-                          \"/root/FINDME\" owner: \"root:root\" permissions: \"0755\""
+                          in the Microvm's cloud init.\nThis can be in the form of
+                          a raw shell script, eg:\nuserdata: |\n  #!/bin/bash\n  echo
+                          \"hi from my microvm\"\n\nor in valid cloud-config, eg:\nuserdata:
+                          |\n\t#cloud-config\n\twrite_files:\n\t- content: \"hello\"\n\t\tpath:
+                          \"/root/FINDME\"\n\t\towner: \"root:root\"\n\t\tpermissions:
+                          \"0755\""
                         type: string
                       vcpu:
                         description: VCPU specifies how many vcpu's the microvm will
@@ -268,20 +326,29 @@ spec:
                               description: ID is a unique identifier for this volume.
                               type: string
                             image:
-                              description: Image is the container image to use for
-                                the volume.
+                              description: Image is the container image to use as
+                                the source for the volume.
+                              type: string
+                            mountPoint:
+                              description: |-
+                                MountPoint specifies the guest mountpoint for the volume.
+                                This will only be applied to additional volumes.
                               type: string
                             readOnly:
                               default: false
                               description: ReadOnly specifies that the volume is to
                                 be mounted readonly.
                               type: boolean
+                            virtiofsPath:
+                              description: VirtioFSPath specifies the path in the
+                                guest where virtiofs is mounted.
+                              type: string
                           required:
                           - id
-                          - image
                           type: object
                         type: array
                     required:
+                    - ""
                     - kernel
                     - memoryMb
                     - networkInterfaces
@@ -289,6 +356,8 @@ spec:
                     - vcpu
                     type: object
                 type: object
+            required:
+            - hosts
             type: object
           status:
             description: MicrovmDeploymentStatus defines the observed state of MicrovmDeployment
@@ -297,41 +366,50 @@ spec:
                 description: Represents the latest available observations of a deployments's
                   current state.
                 items:
-                  description: Condition defines an observation of a Cluster API resource
-                    operational state.
+                  description: |-
+                    Condition defines an observation of a Cluster API resource operational state.
+
+                    Deprecated: This type is deprecated and is going to be removed when support for v1beta1 will be dropped. Please see https://github.com/kubernetes-sigs/cluster-api/blob/main/docs/proposals/20240916-improve-status-in-CAPI-resources.md for more details.
                   properties:
                     lastTransitionTime:
-                      description: Last time the condition transitioned from one status
-                        to another. This should be when the underlying condition changed.
-                        If that is not known, then using the time when the API field
-                        changed is acceptable.
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed. If that is not known, then using the time when
+                        the API field changed is acceptable.
                       format: date-time
                       type: string
                     message:
-                      description: A human readable message indicating details about
-                        the transition. This field may be empty.
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This field may be empty.
+                      maxLength: 10240
+                      minLength: 1
                       type: string
                     reason:
-                      description: The reason for the condition's last transition
-                        in CamelCase. The specific API may choose whether or not this
-                        field is considered a guaranteed API. This field may not be
-                        empty.
+                      description: |-
+                        reason is the reason for the condition's last transition in CamelCase.
+                        The specific API may choose whether or not this field is considered a guaranteed API.
+                        This field may be empty.
+                      maxLength: 256
+                      minLength: 1
                       type: string
                     severity:
-                      description: Severity provides an explicit classification of
-                        Reason code, so the users or machines can immediately understand
-                        the current situation and act accordingly. The Severity field
-                        MUST be set only when Status=False.
+                      description: |-
+                        severity provides an explicit classification of Reason code, so the users or machines can immediately
+                        understand the current situation and act accordingly.
+                        The Severity field MUST be set only when Status=False.
+                      maxLength: 32
                       type: string
                     status:
-                      description: Status of the condition, one of True, False, Unknown.
+                      description: status of the condition, one of True, False, Unknown.
                       type: string
                     type:
-                      description: Type of condition in CamelCase or in foo.example.com/CamelCase.
-                        Many .condition.type values are consistent across resources
-                        like Available, but because arbitrary conditions can be useful
-                        (see .node.status.conditions), the ability to deconflict is
-                        important.
+                      description: |-
+                        type of condition in CamelCase or in foo.example.com/CamelCase.
+                        Many .condition.type values are consistent across resources like Available, but because arbitrary conditions
+                        can be useful (see .node.status.conditions), the ability to deconflict is important.
+                      maxLength: 256
+                      minLength: 1
                       type: string
                   required:
                   - lastTransitionTime

@@ -23,14 +23,14 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
-	"github.com/weaveworks-liquidmetal/controller-pkg/types/microvm"
+	"github.com/liquidmetal-dev/controller-pkg/types/microvm"
 	"github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
 	infrastructurev1alpha1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
 	infrav1 "github.com/weaveworks-liquidmetal/microvm-operator/api/v1alpha1"
@@ -273,7 +273,7 @@ func (r *MicrovmDeploymentReconciler) createReplicaSet(
 		},
 		Spec: infrav1.MicrovmReplicaSetSpec{
 			Host:     host,
-			Replicas: pointer.Int32(mvmDeploymentScope.DesiredReplicas()),
+			Replicas: ptr.To[int32](mvmDeploymentScope.DesiredReplicas()),
 			Template: infrav1.MicrovmTemplateSpec{
 				Spec: mvmDeploymentScope.MicrovmSpec(),
 			},

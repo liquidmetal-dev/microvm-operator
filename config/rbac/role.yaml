@@ -2,64 +2,13 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  creationTimestamp: null
   name: manager-role
 rules:
 - apiGroups:
   - infrastructure.liquid-metal.io
   resources:
   - microvmdeployments
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - infrastructure.liquid-metal.io
-  resources:
-  - microvmdeployments/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - infrastructure.liquid-metal.io
-  resources:
-  - microvmdeployments/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - infrastructure.liquid-metal.io
-  resources:
   - microvmreplicasets
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - infrastructure.liquid-metal.io
-  resources:
-  - microvmreplicasets/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - infrastructure.liquid-metal.io
-  resources:
-  - microvmreplicasets/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - infrastructure.liquid-metal.io
-  resources:
   - microvms
   verbs:
   - create
@@ -72,12 +21,16 @@ rules:
 - apiGroups:
   - infrastructure.liquid-metal.io
   resources:
+  - microvmdeployments/finalizers
+  - microvmreplicasets/finalizers
   - microvms/finalizers
   verbs:
   - update
 - apiGroups:
   - infrastructure.liquid-metal.io
   resources:
+  - microvmdeployments/status
+  - microvmreplicasets/status
   - microvms/status
   verbs:
   - get
