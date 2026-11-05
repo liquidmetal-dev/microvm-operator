@@ -28,7 +28,7 @@ These fields need flintlock v0.16.0 or newer on the host. See
 
 ## Contributing
 
-Refer to the general [Liquid Metal contribution guides](https://weaveworks-liquidmetal.github.io/site/docs/category/guide-for-contributors/).
+Refer to the general [Liquid Metal contribution guides](https://www.liquidmetal.dev/docs/category/guide-for-contributors/).
 
 ### How it works
 This project aims to follow the Kubernetes [Operator pattern](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/)
